@@ -1,0 +1,47 @@
+@import url("https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500;700;900&display=swap");
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  scroll-behavior: smooth;
+}
+
+body {
+  height: 100vh;
+  font-family: "Roboto", sans-serif;
+  background: no-repeat center/cover url("https://img5.goodfon.com/original/1366x768/d/5f/rok-kontsert-stsena-siluet.jpg");
+}
+
+main {
+  display: flex;
+  flex: 1;
+  min-height: 100vh;
+  align-items: center;
+  justify-content: center;
+  background: #00000047;
+}
+
+.drum-kit__key {
+  text-transform: uppercase;
+  border: 0.1rem solid black;
+  border-radius: 0.5rem;
+  margin: 1rem;
+  font-size: 1.5rem;
+  padding: 1rem 0.5rem;
+  transition: all 0.07s ease;
+  width: 10rem;
+  height: 10rem;
+  text-align: center;
+  color: white;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  -webkit-transition: background-color 0.3s;
+  transition: background-color 0.3s;
+}
+
+.keydown {
+  background-color: red;
+}
