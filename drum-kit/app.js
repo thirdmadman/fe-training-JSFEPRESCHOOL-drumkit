@@ -414,6 +414,13 @@ class SequenceStep {
   switchState() {
     this.state = !this.state;
   }
+  setState(state) {
+    this.state = state;
+  }
+
+  export() {
+    return { state: this.state, id: this.id };
+  }
 }
 
 class ChannelSequence {
@@ -433,13 +440,31 @@ class ChannelSequence {
   }
 
   addSteps(numberOfSteps) {
-    for (let stepNumber = this.stepsNumber; stepNumber < numberOfSteps - 1; stepNumber++) {
+    for (let stepNumber = this.stepsNumber; stepNumber < this.stepsNumber + numberOfSteps; stepNumber++) {
       this.sequenceSteps.push(new SequenceStep(stepNumber));
-      this.stepsNumber++;
     }
+    this.stepsNumber += numberOfSteps;
   }
 
-  removeSteps() {}
+  getStepById(id) {
+    return this.sequenceSteps.find((sequenceStep) => sequenceStep.id === id);
+  }
+
+  switchStateEvry(N) {
+    this.sequenceSteps.forEach((sequenceStep) => (!((sequenceStep.id + 1) % N) ? sequenceStep.setState(true) : null));
+  }
+
+  removeSteps(numberOfSteps) {
+    // let sequenceStepsToRemove = this.sequenceSteps.slice(stepsNumber - numberOfSteps, this.stepsNumber);
+    // sequenceStepsToRemove.forEach((el) => el.remove());
+    this.sequenceSteps = this.sequenceSteps.slice(0, this.stepsNumber - numberOfSteps);
+    this.stepsNumber -= numberOfSteps;
+  }
+
+  export() {
+    let sequenceStepsArray = this.sequenceSteps.map((el) => el.export());
+    return { channelName: this.channelName, sequenceSteps: sequenceStepsArray, stepsNumber: this.stepsNumber };
+  }
 }
 
 class SequencerPattern {
@@ -452,9 +477,33 @@ class SequencerPattern {
     this.stepsNumber = stepsNumber;
   }
   addChannelSequence(channelName) {
-    let newChannelSequence = new ChannelSequence(channelName,this.stepsNumber);
+    let newChannelSequence = new ChannelSequence(channelName, this.stepsNumber);
     this.channelSequences.push(newChannelSequence);
     return newChannelSequence;
+  }
+
+  getChannelSequence(channelName) {
+    return this.channelSequences.find((channelSequence) => channelSequence.channelName === channelName);
+  }
+
+  addSequenceSteps(numberOfSteps) {
+    this.channelSequences.forEach((channelSequence) => channelSequence.addSteps(numberOfSteps));
+    this.stepsNumber += numberOfSteps;
+    return this.channelSequences;
+  }
+
+  removeSequenceSteps(numberOfSteps) {
+    if (numberOfSteps > 0 && this.stepsNumber !== null && this.stepsNumber >= numberOfSteps) {
+      this.channelSequences.forEach((channelSequence) => channelSequence.removeSteps(numberOfSteps));
+      this.stepsNumber -= numberOfSteps;
+    }
+
+    return this.channelSequences;
+  }
+
+  export() {
+    let channelSequencesArray = this.channelSequences.map((el) => el.export());
+    return { channelSequences: channelSequencesArray, patternName: this.patternName, stepsNumber: this.stepsNumber };
   }
 }
 
@@ -496,8 +545,10 @@ class Channel {
     }
   }
 
-  remove() {
-    
+  remove() {}
+
+  export() {
+    return { volume: this.volume, name: this.name, soundSrc: this.soundSrc };
   }
 }
 
@@ -506,8 +557,9 @@ class StepSequencer {
   sequencerPatterns = [];
   isPlaying = null;
   currentSelectedPatternName = null;
-  bpm = null;
-  intervalInMillis = null;
+  bpm = 120;
+  timer = null;
+  lastPlayedStep = 0;
 
   constructor() {}
 
@@ -519,7 +571,7 @@ class StepSequencer {
 
   addSequencerPattern(patternName, stepsNumber) {
     let newSequencerPattern = new SequencerPattern(patternName, stepsNumber);
-    this.channels.forEach(channel => newSequencerPattern.addChannelSequence(channel.name));
+    this.channels.forEach((channel) => newSequencerPattern.addChannelSequence(channel.name));
     this.sequencerPatterns.push(newSequencerPattern);
     return newSequencerPattern;
   }
@@ -545,16 +597,49 @@ class StepSequencer {
     }
     return false;
   }
-  
-  play() {
-    this.isPlaying = !this.isPlaying;
+
+  getCurretnSequencerPattern() {
+    return this.sequencerPatterns.find((sequencerPattern) => sequencerPattern.patternName === this.currentSelectedPatternName);
   }
 
-  exportToJson() {}
+  play() {
+    this.isPlaying = !this.isPlaying;
+
+    this.lastPlayedStep = 0;
+    if (this.timer == null) {
+      this.timer = setInterval(() => {
+        if (this.isPlaying === false) {
+          clearInterval(this.timer);
+          this.timer = null;
+          return;
+        }
+        if (this.lastPlayedStep >= this.getCurretnSequencerPattern().stepsNumber) {
+          this.lastPlayedStep = 0;
+        }
+
+        this.channels.forEach((channel) => {
+          //console.log(this.getCurretnSequencerPattern().getChannelSequence(channel.name).getStepById(this.lastPlayedStep));
+          let curretnChannelStep = this.getCurretnSequencerPattern().getChannelSequence(channel.name).getStepById(this.lastPlayedStep);
+          if (curretnChannelStep.state) {
+            channel.playSound();
+          }
+        });
+
+        this.lastPlayedStep++;
+      }, 1000 / (this.bpm / 60) / 4);
+    }
+  }
+
+  export() {
+    let channelsArray = this.channels.map((el) => el.export());
+    let sequencerPatternsArray = this.sequencerPatterns.map((el) => el.export());
+    return { channels: channelsArray, sequencerPatterns: sequencerPatternsArray, bpm: this.bpm };
+  }
 }
 
 class DrumPad {
   //???
+  export() {}
 }
 
 class DigitalAudioWorkstation {
@@ -570,11 +655,56 @@ class DigitalAudioWorkstation {
       "https://d9olupt5igjta.cloudfront.net/samples/sample_files/68698/8d9c078a6497811bab1126448f956fceea3c618f/mp3/_X-808CB2.mp3?1617246270",
       1
     );
+    this.stepSequencer.addChannel(
+      "kick",
+      "https://d9olupt5igjta.cloudfront.net/samples/sample_files/85486/7e678db81002e109d836d4c89a200ed1c6e0cf1f/mp3/_IqBu__Kick_6_-_A.mp3?1629308763",
+      1
+    );
     this.stepSequencer.addSequencerPattern("1", 16);
+    this.stepSequencer.currentSelectedPatternName = "1";
+    this.stepSequencer.getCurretnSequencerPattern().getChannelSequence("cowbell").switchStateEvry(2);
+    this.stepSequencer.getCurretnSequencerPattern().getChannelSequence("kick").switchStateEvry(8);
     console.log(this.stepSequencer);
   }
+
+  export() {
+    return { drumPad: this.drumPad.export(), stepSequencer: this.stepSequencer.export() };
+  }
+
+  importFromJsonString(jsonString) {
+    const importObj = JSON.parse(jsonString);
+    this.stepSequencer = new StepSequencer();
+    this.drumPad = new DrumPad();
+
+    this.stepSequencer.bpm = importObj.stepSequencer.bpm;
+
+    if (importObj.stepSequencer.channels.length > 0) {
+      importObj.stepSequencer.channels.forEach((channel) => this.stepSequencer.addChannel(channel.name, channel.soundSrc, channel.volume));
+      if (importObj.stepSequencer.sequencerPatterns.length > 0) {
+        importObj.stepSequencer.sequencerPatterns.forEach((sequencerPattern) => {
+          let newsequencerPattern = this.stepSequencer.addSequencerPattern(sequencerPattern.patternName, sequencerPattern.stepsNumber);
+          sequencerPattern.channelSequences.forEach( channelSequences => {
+            channelSequences.sequenceSteps.forEach( step => newsequencerPattern.getChannelSequence(channelSequences.channelName).getStepById(step.id).setState(step.state));
+          })
+        });
+        this.stepSequencer.currentSelectedPatternName = this.stepSequencer.sequencerPatterns[0].patternName;
+      }
+    }
+  }
+
   loadFile(fileContent) {}
-  saveFile(fileName) {}
+
+  saveFile(fileName) {
+    const a = document.createElement("a");
+    const file = new Blob([JSON.stringify(this.export())], { type: "text/plain" });
+
+    a.href = URL.createObjectURL(file);
+    a.download = fileName;
+    a.click();
+
+    URL.revokeObjectURL(a.href);
+  }
 }
 
 let DAW = new DigitalAudioWorkstation();
+//console.log(DAW.saveFile("gg.json"));
