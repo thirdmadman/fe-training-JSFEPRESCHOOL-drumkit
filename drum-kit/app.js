@@ -587,8 +587,8 @@ class Channel {
 
   //
   nodeEl = null;
-
   volumeSliderEl = null;
+  isMutedEl = null;
 
   constructor(name, soundSrc, volume) {
     this.volume = volume;
@@ -604,30 +604,40 @@ class Channel {
     nameEl.className = "channel__name";
     nameEl.innerText = this.name;
 
-    this.volumeSliderEl = document.createElement("input");
-    this.volumeSliderEl.className = "channel__volume-slider";
-    this.volumeSliderEl.value = volume;
-    this.volumeSliderEl.type = "range";
-    this.volumeSliderEl.min = "0";
-    this.volumeSliderEl.max = "1";
-    this.volumeSliderEl.step = "0.01";
-    this.volumeSliderEl.oninput = () => {
-      this.setVolume(this.volumeSliderEl.value);
+    this.isMutedEl = document.createElement("input");
+    this.isMutedEl.type = "checkbox";
+    this.isMutedEl.checked = false;
+    this.isMutedEl.oninput = () => {
+      console.log(this.isMutedEl.checked);
+      this.setMute(this.isMutedEl.checked);
     };
 
+    this.volumeSliderEl = document.createElement("input");
+    this.volumeSliderEl.className = "channel__volume-slider";
+    this.volumeSliderEl.value = this.volume*100;
+    this.volumeSliderEl.type = "range";
+    this.volumeSliderEl.min = "0";
+    this.volumeSliderEl.max = "100";
+    this.volumeSliderEl.step = "1";
+    this.volumeSliderEl.oninput = () => {
+      this.setVolume(this.volumeSliderEl.value/100);
+    };
+    //console.log(this.volume);
+    console.log(this.volumeSliderEl.value);
 
     this.nodeEl.appendChild(nameEl);
     this.nodeEl.appendChild(this.volumeSliderEl);
-
+    this.nodeEl.appendChild(this.isMutedEl);
   }
 
-  switchMute() {
-    this.isMuted = !this.isMuted;
-    return this.isMuted;
+  setMute(state) {
+    this.isMuted = state;
+    return state;
   }
 
   setVolume(volume) {
     this.volume = volume;
+    this.volumeSliderEl.value = this.volume*100;
     return true;
   }
 
@@ -667,7 +677,6 @@ class StepSequencer {
   controlsEl = null;
 
   constructor() {
-
     this.controlsEl = document.createElement("div");
     this.controlsEl.className = "sequencer-controls";
 
@@ -679,8 +688,6 @@ class StepSequencer {
 
     this.nodeEl = document.createElement("div");
     this.nodeEl.className = "step-sequencer";
-
-
 
     this.createControls();
   }
@@ -750,7 +757,6 @@ class StepSequencer {
 
     this.nodeEl.appendChild(this.controlsEl);
     this.nodeEl.appendChild(this.bodyEl);
-
   }
 
   removeChannelByName(name) {
@@ -843,22 +849,25 @@ class DigitalAudioWorkstation {
     this.stepSequencer = new StepSequencer();
     this.drumPad = new DrumPad();
 
-    //!HARDCODE
-    this.stepSequencer.addChannel(
-      "cowbell",
-      "https://d9olupt5igjta.cloudfront.net/samples/sample_files/68698/8d9c078a6497811bab1126448f956fceea3c618f/mp3/_X-808CB2.mp3?1617246270",
-      1
-    );
-    this.stepSequencer.addChannel(
-      "kick",
-      "https://d9olupt5igjta.cloudfront.net/samples/sample_files/85486/7e678db81002e109d836d4c89a200ed1c6e0cf1f/mp3/_IqBu__Kick_6_-_A.mp3?1629308763",
-      1
-    );
+    //!HARDCODE>
+    keysArray.forEach(el => this.stepSequencer.addChannel(el.soundName, el.soundSrc, 1));
+
+    // this.stepSequencer.addChannel(
+    //   "cowbell",
+    //   "https://d9olupt5igjta.cloudfront.net/samples/sample_files/68698/8d9c078a6497811bab1126448f956fceea3c618f/mp3/_X-808CB2.mp3?1617246270",
+    //   1
+    // );
+    // this.stepSequencer.addChannel(
+    //   "kick",
+    //   "https://d9olupt5igjta.cloudfront.net/samples/sample_files/85486/7e678db81002e109d836d4c89a200ed1c6e0cf1f/mp3/_IqBu__Kick_6_-_A.mp3?1629308763",
+    //   1
+    // );
     this.stepSequencer.addSequencerPattern("1", 16);
     this.stepSequencer.currentSelectedPatternName = "1";
-    this.stepSequencer.getCurretnSequencerPattern().getChannelSequence("cowbell").switchStateEvry(2);
-    this.stepSequencer.getCurretnSequencerPattern().getChannelSequence("kick").switchStateEvry(8);
+    // this.stepSequencer.getCurretnSequencerPattern().getChannelSequence("cowbell").switchStateEvry(2);
+    // this.stepSequencer.getCurretnSequencerPattern().getChannelSequence("kick").switchStateEvry(8);
     console.log(this.stepSequencer);
+    //!HARDCODE<
 
     this.nodeEl = document.createElement("div");
     this.nodeEl.className = "daw-container";
