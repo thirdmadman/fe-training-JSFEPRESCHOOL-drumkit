@@ -417,7 +417,9 @@ class SequenceStep {
     this.nodeEl.className = "sequence-step";
     this.setState(this.state);
 
-    this.nodeEl.addEventListener("click", () => {this.switchState()});
+    this.nodeEl.addEventListener("click", () => {
+      this.switchState();
+    });
 
     if ((this.id + 8) % 8 > 3) {
       this.nodeEl.classList.add("sequence-step_black");
@@ -584,6 +586,9 @@ class Channel {
   isMuted = null;
 
   //
+  nodeEl = null;
+
+  volumeSliderEl = null;
 
   constructor(name, soundSrc, volume) {
     this.volume = volume;
@@ -591,6 +596,29 @@ class Channel {
     this.soundSrc = soundSrc;
     this.audiotrack = new Audio(this.soundSrc);
     this.isMuted = false;
+
+    this.nodeEl = document.createElement("div");
+    this.nodeEl.className = "channel";
+
+    let nameEl = document.createElement("div");
+    nameEl.className = "channel__name";
+    nameEl.innerText = this.name;
+
+    this.volumeSliderEl = document.createElement("input");
+    this.volumeSliderEl.className = "channel__volume-slider";
+    this.volumeSliderEl.value = volume;
+    this.volumeSliderEl.type = "range";
+    this.volumeSliderEl.min = "0";
+    this.volumeSliderEl.max = "1";
+    this.volumeSliderEl.step = "0.01";
+    this.volumeSliderEl.oninput = () => {
+      this.setVolume(this.volumeSliderEl.value);
+    };
+
+
+    this.nodeEl.appendChild(nameEl);
+    this.nodeEl.appendChild(this.volumeSliderEl);
+
   }
 
   switchMute() {
@@ -633,22 +661,31 @@ class StepSequencer {
   //
   nodeEl = null;
 
-  patternEl = null;
   channesEl = null;
+  patternEl = null;
+  bodyEl = null;
   controlsEl = null;
 
   constructor() {
-    this.nodeEl = document.createElement("div");
-    this.nodeEl.className = "step-sequencer";
 
     this.controlsEl = document.createElement("div");
     this.controlsEl.className = "sequencer-controls";
+
+    this.bodyEl = document.createElement("div");
+    this.bodyEl.className = "sequencer-body";
+
+    this.channesEl = document.createElement("div");
+    this.channesEl.className = "channels";
+
+    this.nodeEl = document.createElement("div");
+    this.nodeEl.className = "step-sequencer";
+
+
 
     this.createControls();
   }
 
   createControls() {
-
     let bpminput = document.createElement("input");
     bpminput.value = 120;
 
@@ -656,7 +693,10 @@ class StepSequencer {
 
     const btnPaly = document.createElement("button");
     btnPaly.textContent = "play";
-    btnPaly.addEventListener("click", () => {this.play(); this.setBPM(bpminput.value)});
+    btnPaly.addEventListener("click", () => {
+      this.play();
+      this.setBPM(bpminput.value);
+    });
     this.controlsEl.appendChild(btnPaly);
 
     const btnAddPads = document.createElement("button");
@@ -680,6 +720,8 @@ class StepSequencer {
   addChannel(name, soundSrc, volume) {
     let newChannel = new Channel(name, soundSrc, volume);
     this.channels.push(newChannel);
+    this.channesEl.appendChild(newChannel.getNodeEl());
+
     return newChannel;
   }
 
@@ -693,19 +735,22 @@ class StepSequencer {
 
   switchCurrentPattern(patternName) {
     let pattern = this.getSequencerPattern(patternName);
-    if (pattern){
+    if (pattern) {
       this.currentSelectedPatternName = patternName;
       this.patternEl = pattern.getNodeEl();
-      this.nodeEl.innerHTML = '';
-      this.draw()
+      this.nodeEl.innerHTML = "";
+      this.draw();
     }
     return pattern;
   }
 
   draw() {
-    //this.nodeEl.appendChild(this.channesEl);
-    this.nodeEl.appendChild(this.patternEl);
+    this.bodyEl.appendChild(this.channesEl);
+    this.bodyEl.appendChild(this.patternEl);
+
     this.nodeEl.appendChild(this.controlsEl);
+    this.nodeEl.appendChild(this.bodyEl);
+
   }
 
   removeChannelByName(name) {
@@ -739,7 +784,6 @@ class StepSequencer {
   }
 
   play() {
-
     this.isPlaying = !this.isPlaying;
 
     this.lastPlayedStep = 0;
@@ -758,7 +802,7 @@ class StepSequencer {
           //console.log(this.getCurretnSequencerPattern().getChannelSequence(channel.name).getStepById(this.lastPlayedStep));
           let curretnChannelStep = this.getCurretnSequencerPattern().getChannelSequence(channel.name).getStepById(this.lastPlayedStep);
           curretnChannelStep.setPlayingState(true);
-          setTimeout(() => curretnChannelStep.setPlayingState(false), (1000 / (this.bpm / 60) / 4));
+          setTimeout(() => curretnChannelStep.setPlayingState(false), 1000 / (this.bpm / 60) / 4);
           if (curretnChannelStep.state) {
             channel.playSound();
           }
@@ -832,7 +876,7 @@ class DigitalAudioWorkstation {
   }
 
   render() {
-    this.nodeEl.innerHTML = '';
+    this.nodeEl.innerHTML = "";
     this.nodeEl.appendChild(this.stepSequencer.getNodeEl());
   }
 

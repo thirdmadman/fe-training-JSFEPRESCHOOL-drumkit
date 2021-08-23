@@ -88,7 +88,7 @@ main {
 }
 
 .pad_current-playing {
-  box-shadow: inset 0px 0px 6px 1px #ffffff
+  box-shadow: inset 0px 0px 6px 1px #ffffff;
 }
 
 .drum-kit-rhythm__pad {
@@ -99,4 +99,53 @@ main {
 
 .drum-kit-rhythm__pad:hover {
   transition-duration: 0s;
+}
+
+/*DAW*/
+.daw-container {
+  background: rgb(255 255 255 / 50%);
+  padding: 10px;
+}
+.step-sequencer {
+  display: flex;
+  flex-direction: column;
+}
+.sequencer-pattern {
+}
+.channel-sequence {
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+}
+.sequence-step {
+  height: 16px;
+  width: 16px;
+  margin: 2px;
+}
+.sequence-step_black {
+  background-color: #000000;
+}
+.sequence-step_gray {
+  background-color: #696969;
+}
+.sequence-step_active {
+  background-color: #ff0000;
+}
+
+.sequence-step_current-playing {
+  box-shadow: inset 0px 0px 6px 1px #ffffff;
+}
+.channels {
+}
+.channel {
+  display: flex;
+  justify-content: flex-end;
+}
+.channel__name {
+}
+.channel__volume-slider {
+}
+
+.sequencer-body {
+  display: flex;
 }
