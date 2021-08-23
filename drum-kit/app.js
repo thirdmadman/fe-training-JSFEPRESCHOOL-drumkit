@@ -521,6 +521,11 @@ class ChannelSequence {
     this.stepsNumber -= numberOfSteps;
   }
 
+  remove() {
+    this.sequenceSteps.forEach((sequenceStep) => sequenceStep.remove());
+    this.sequenceSteps = null;
+  }
+
   export() {
     let sequenceStepsArray = this.sequenceSteps.map((el) => el.export());
     return { channelName: this.channelName, sequenceSteps: sequenceStepsArray, stepsNumber: this.stepsNumber };
@@ -568,6 +573,11 @@ class SequencerPattern {
     return this.channelSequences;
   }
 
+  removeChannelSequence(channelName) {
+    this.getChannelSequence(channelName).remove();
+    this.channelSequences = this.channelSequences.filter((channelSequence) => channelSequence.channelName !== channelName);
+  }
+
   getNodeEl() {
     return this.nodeEl;
   }
@@ -606,24 +616,22 @@ class Channel {
 
     this.isMutedEl = document.createElement("input");
     this.isMutedEl.type = "checkbox";
+    this.isMutedEl.className = "channel__volume-mute";
     this.isMutedEl.checked = false;
     this.isMutedEl.oninput = () => {
-      console.log(this.isMutedEl.checked);
       this.setMute(this.isMutedEl.checked);
     };
 
     this.volumeSliderEl = document.createElement("input");
     this.volumeSliderEl.className = "channel__volume-slider";
-    this.volumeSliderEl.value = this.volume*100;
+    this.volumeSliderEl.value = this.volume * 100;
     this.volumeSliderEl.type = "range";
     this.volumeSliderEl.min = "0";
     this.volumeSliderEl.max = "100";
     this.volumeSliderEl.step = "1";
     this.volumeSliderEl.oninput = () => {
-      this.setVolume(this.volumeSliderEl.value/100);
+      this.setVolume(this.volumeSliderEl.value / 100);
     };
-    //console.log(this.volume);
-    console.log(this.volumeSliderEl.value);
 
     this.nodeEl.appendChild(nameEl);
     this.nodeEl.appendChild(this.volumeSliderEl);
@@ -637,7 +645,7 @@ class Channel {
 
   setVolume(volume) {
     this.volume = volume;
-    this.volumeSliderEl.value = this.volume*100;
+    this.volumeSliderEl.value = this.volume * 100;
     return true;
   }
 
@@ -653,7 +661,9 @@ class Channel {
     return this.nodeEl;
   }
 
-  remove() {}
+  remove() {
+    this.nodeEl.remove();
+  }
 
   export() {
     return { volume: this.volume, name: this.name, soundSrc: this.soundSrc };
@@ -676,6 +686,8 @@ class StepSequencer {
   bodyEl = null;
   controlsEl = null;
 
+  bpminput = null;
+
   constructor() {
     this.controlsEl = document.createElement("div");
     this.controlsEl.className = "sequencer-controls";
@@ -693,43 +705,61 @@ class StepSequencer {
   }
 
   createControls() {
-    let bpminput = document.createElement("input");
-    bpminput.value = 120;
+    this.bpminput = document.createElement("input");
+    this.bpminput.value = this.bpm;
 
-    this.controlsEl.appendChild(bpminput);
+    this.bpminput.classList.add("sequencer-controls__bpm-input");
+
+    this.controlsEl.appendChild(this.bpminput);
 
     const btnPaly = document.createElement("button");
+    btnPaly.classList.add("sequencer-controls__button-play");
+    btnPaly.classList.add("sequencer-controls__button-play_play");
     btnPaly.textContent = "play";
     btnPaly.addEventListener("click", () => {
       this.play();
-      this.setBPM(bpminput.value);
+      this.setBPM(this.bpminput.value);
+      btnPaly.classList.toggle("sequencer-controls__button-play_pause");
+      btnPaly.classList.toggle("sequencer-controls__button-play_play");
     });
     this.controlsEl.appendChild(btnPaly);
 
-    const btnAddPads = document.createElement("button");
-    btnAddPads.textContent = "add 8 pads";
-    btnAddPads.addEventListener("click", () => this.getCurretnSequencerPattern().addSequenceSteps(8));
-    this.controlsEl.appendChild(btnAddPads);
+    const btnAddSteps = document.createElement("button");
+    btnAddSteps.classList.add("sequencer-controls__button-add-steps");
+    btnAddSteps.textContent = "add 8 steps";
+    btnAddSteps.addEventListener("click", () => this.getCurretnSequencerPattern().addSequenceSteps(8));
+    this.controlsEl.appendChild(btnAddSteps);
 
-    const btnRemovePads = document.createElement("button");
-    btnRemovePads.textContent = "delete 8 pads";
-    btnRemovePads.addEventListener("click", () => this.getCurretnSequencerPattern().removeSequenceSteps(8));
-    this.controlsEl.appendChild(btnRemovePads);
+    const btnRemoveSteps = document.createElement("button");
+    btnRemoveSteps.classList.add("sequencer-controls__button-remove-steps");
+    btnRemoveSteps.textContent = "remove 8 steps";
+    btnRemoveSteps.addEventListener("click", () => this.getCurretnSequencerPattern().removeSequenceSteps(8));
+    this.controlsEl.appendChild(btnRemoveSteps);
 
-    //this.updateInstrumetSelectList();
-
-    // const btnAddInstrument = document.createElement("button");
-    // btnAddInstrument.textContent = "add instrument";
-    // btnAddInstrument.addEventListener("click", () => this.addInstrument(this.selectAddInstrument.options[this.selectAddInstrument.selectedIndex].value, 1));
-    // this.controlsEl.appendChild(btnAddInstrument);
+    const btnAddChannel = document.createElement("button");
+    btnAddChannel.classList.add("sequencer-controls__button-add-channel");
+    btnAddChannel.textContent = "add channel";
+    btnAddChannel.addEventListener("click", () => this.showAddNewInstrument());
+    this.controlsEl.appendChild(btnAddChannel);
   }
 
   addChannel(name, soundSrc, volume) {
-    let newChannel = new Channel(name, soundSrc, volume);
-    this.channels.push(newChannel);
-    this.channesEl.appendChild(newChannel.getNodeEl());
+    if (!this.getChannel(name)) {
+      let newChannel = new Channel(name, soundSrc, volume);
+      this.channels.push(newChannel);
+      this.channesEl.appendChild(newChannel.getNodeEl());
 
-    return newChannel;
+      const btnRemoveChannel = document.createElement("button");
+      btnRemoveChannel.classList.add("sequencer-controls__button-remove-channel");
+      btnRemoveChannel.textContent = "x";
+      btnRemoveChannel.addEventListener("click", () => this.removeChannelByName(name));
+      newChannel.getNodeEl().appendChild(btnRemoveChannel);
+
+      if (this.getCurretnSequencerPattern()) {
+        this.getCurretnSequencerPattern().addChannelSequence(name);
+      }
+      return newChannel;
+    }
   }
 
   addSequencerPattern(patternName, stepsNumber) {
@@ -744,14 +774,16 @@ class StepSequencer {
     let pattern = this.getSequencerPattern(patternName);
     if (pattern) {
       this.currentSelectedPatternName = patternName;
+
       this.patternEl = pattern.getNodeEl();
-      this.nodeEl.innerHTML = "";
       this.draw();
     }
     return pattern;
   }
 
   draw() {
+    this.nodeEl.innerHTML = "";
+    this.bodyEl.innerHTML = "";
     this.bodyEl.appendChild(this.channesEl);
     this.bodyEl.appendChild(this.patternEl);
 
@@ -762,8 +794,10 @@ class StepSequencer {
   removeChannelByName(name) {
     let channelToRemove = this.channels.find((channel) => channel.name === name);
     if (channelToRemove) {
-      console.log(channelToRemove);
       channelToRemove.remove();
+      this.sequencerPatterns.forEach((sequencerPattern) => {
+        sequencerPattern.removeChannelSequence(name);
+      });
       this.channels = this.channels.filter((channel) => channel.name !== name);
       return true;
     }
@@ -785,8 +819,41 @@ class StepSequencer {
     return this.sequencerPatterns.find((sequencerPattern) => sequencerPattern.patternName === patternName);
   }
 
+  getChannel(name) {
+    return this.channels.find((channel) => channel.name === name);
+  }
+
   getCurretnSequencerPattern() {
     return this.sequencerPatterns.find((sequencerPattern) => sequencerPattern.patternName === this.currentSelectedPatternName);
+  }
+
+  showAddNewInstrument() {
+    let modalEl = document.createElement("div");
+    modalEl.classList.add("modal-window");
+    modalEl.classList.add("modal-window_add-instrument");
+
+    let name = document.createElement("input");
+    let srcLink = document.createElement("input");
+    let buttonAdd = document.createElement("button");
+    buttonAdd.innerText = "Add channel";
+    let buttonCancel = document.createElement("button");
+    buttonCancel.innerText = "Cancel";
+
+    buttonCancel.onclick = () => {
+      modalEl.remove();
+    };
+
+    buttonAdd.onclick = () => {
+      this.addChannel(name.value, srcLink.value, 1);
+      modalEl.remove();
+    };
+
+    modalEl.appendChild(name);
+    modalEl.appendChild(srcLink);
+    modalEl.appendChild(buttonAdd);
+    modalEl.appendChild(buttonCancel);
+
+    document.body.appendChild(modalEl);
   }
 
   play() {
@@ -805,7 +872,7 @@ class StepSequencer {
         }
 
         this.channels.forEach((channel) => {
-          //console.log(this.getCurretnSequencerPattern().getChannelSequence(channel.name).getStepById(this.lastPlayedStep));
+          //console.log(this.getCurretnSequencerPattern().getChannelSequence(channel.name));
           let curretnChannelStep = this.getCurretnSequencerPattern().getChannelSequence(channel.name).getStepById(this.lastPlayedStep);
           curretnChannelStep.setPlayingState(true);
           setTimeout(() => curretnChannelStep.setPlayingState(false), 1000 / (this.bpm / 60) / 4);
@@ -820,6 +887,7 @@ class StepSequencer {
   }
 
   setBPM(bpm) {
+    this.bpminput.value = bpm;
     this.bpm = bpm;
   }
 
@@ -844,13 +912,14 @@ class DigitalAudioWorkstation {
   stepSequencer = null;
   //
   nodeEl = null;
+  controlsEl = null;
 
   constructor() {
     this.stepSequencer = new StepSequencer();
     this.drumPad = new DrumPad();
 
     //!HARDCODE>
-    keysArray.forEach(el => this.stepSequencer.addChannel(el.soundName, el.soundSrc, 1));
+    keysArray.forEach((el) => this.stepSequencer.addChannel(el.soundName, el.soundSrc, 1));
 
     // this.stepSequencer.addChannel(
     //   "cowbell",
@@ -872,8 +941,64 @@ class DigitalAudioWorkstation {
     this.nodeEl = document.createElement("div");
     this.nodeEl.className = "daw-container";
 
+    this.controlsEl = document.createElement("div");
+    this.controlsEl.className = "daw-controls";
+
+    this.createControls();
+
     document.getElementsByTagName("main")[0].append(this.nodeEl);
     this.render();
+  }
+
+  createControls() {
+    let saveFileNameinput = document.createElement("input");
+    saveFileNameinput.value = "savedProject.json";
+    saveFileNameinput.classList.add("daw-controls__savename-input");
+    this.controlsEl.appendChild(saveFileNameinput);
+
+    const btnSaveFile = document.createElement("button");
+    btnSaveFile.classList.add("daw-controls__button-save");
+    btnSaveFile.textContent = "Save File";
+    btnSaveFile.addEventListener("click", () => {
+      this.saveFile(saveFileNameinput.value);
+    });
+    this.controlsEl.appendChild(btnSaveFile);
+
+    const btnImportFile = document.createElement("input");
+    btnImportFile.classList.add("daw-controls__button-import");
+    btnImportFile.type = "file";
+    btnImportFile.textContent = "Import File";
+    btnImportFile.addEventListener("change", (e) => {
+      let file = e.target.files[0];
+      if (!file) {
+        return;
+      }
+      let reader = new FileReader();
+      reader.onload = (e) => {
+        let contents = e.target.result;
+        this.importFromJsonString(contents);
+      };
+      reader.readAsText(file);
+    }, false);
+    this.controlsEl.appendChild(btnImportFile);
+
+    // const btnAddSteps = document.createElement("button");
+    // btnAddSteps.classList.add("sequencer-controls__button-add-steps");
+    // btnAddSteps.textContent = "add 8 steps";
+    // btnAddSteps.addEventListener("click", () => this.getCurretnSequencerPattern().addSequenceSteps(8));
+    // this.controlsEl.appendChild(btnAddSteps);
+
+    // const btnRemoveSteps = document.createElement("button");
+    // btnRemoveSteps.classList.add("sequencer-controls__button-remove-steps");
+    // btnRemoveSteps.textContent = "remove 8 steps";
+    // btnRemoveSteps.addEventListener("click", () => this.getCurretnSequencerPattern().removeSequenceSteps(8));
+    // this.controlsEl.appendChild(btnRemoveSteps);
+
+    // const btnAddChannel = document.createElement("button");
+    // btnAddChannel.classList.add("sequencer-controls__button-add-channel");
+    // btnAddChannel.textContent = "add channel";
+    // btnAddChannel.addEventListener("click", () => this.showAddNewInstrument());
+    // this.controlsEl.appendChild(btnAddChannel);
   }
 
   export() {
@@ -886,6 +1011,7 @@ class DigitalAudioWorkstation {
 
   render() {
     this.nodeEl.innerHTML = "";
+    this.nodeEl.appendChild(this.controlsEl);
     this.nodeEl.appendChild(this.stepSequencer.getNodeEl());
   }
 
@@ -894,7 +1020,7 @@ class DigitalAudioWorkstation {
     this.stepSequencer = new StepSequencer();
     this.drumPad = new DrumPad();
 
-    this.stepSequencer.bpm = importObj.stepSequencer.bpm;
+    this.stepSequencer.setBPM(importObj.stepSequencer.bpm);
 
     if (importObj.stepSequencer.channels.length > 0) {
       importObj.stepSequencer.channels.forEach((channel) => this.stepSequencer.addChannel(channel.name, channel.soundSrc, channel.volume));
