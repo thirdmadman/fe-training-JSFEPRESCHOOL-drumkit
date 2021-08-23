@@ -400,22 +400,60 @@ class DrumKitRhythm {
   }
 }
 
-let drumKitRhythm = new DrumKitRhythm(keysArray, 16);
+//let drumKitRhythm = new DrumKitRhythm(keysArray, 16);
 
 //console.log(drumKitRhythm.export());
 
 class SequenceStep {
   state = null;
   id = null;
+  //
+  nodeEl = null;
+
   constructor(id, state = false) {
     this.state = Boolean(state);
     this.id = id;
+    this.nodeEl = document.createElement("div");
+    this.nodeEl.className = "sequence-step";
+    this.setState(this.state);
+
+    this.nodeEl.addEventListener("click", () => {this.switchState()});
+
+    if ((this.id + 8) % 8 > 3) {
+      this.nodeEl.classList.add("sequence-step_black");
+    } else {
+      this.nodeEl.classList.add("sequence-step_gray");
+    }
   }
+
   switchState() {
     this.state = !this.state;
+    this.nodeEl.classList.toggle("sequence-step_active");
   }
+
   setState(state) {
     this.state = state;
+    if (this.state) {
+      this.nodeEl.classList.add("sequence-step_active");
+    } else {
+      this.nodeEl.classList.remove("sequence-step_active");
+    }
+  }
+
+  setPlayingState(state) {
+    if (state) {
+      this.nodeEl.classList.add("sequence-step_current-playing");
+    } else {
+      this.nodeEl.classList.remove("sequence-step_current-playing");
+    }
+  }
+
+  getNodeEl() {
+    return this.nodeEl;
+  }
+
+  remove() {
+    this.nodeEl.remove();
   }
 
   export() {
@@ -427,21 +465,35 @@ class ChannelSequence {
   channelName = null;
   sequenceSteps = [];
   stepsNumber = 0;
+
+  nodeEl = null;
+
   constructor(channelName, stepsNumber = 0, sequenceSteps = null) {
+    this.nodeEl = document.createElement("div");
+    this.nodeEl.className = "channel-sequence";
+
     this.channelName = channelName;
     if (stepsNumber > 0 && !sequenceSteps) {
       this.addSteps(stepsNumber);
     } else if (sequenceSteps && sequenceSteps.length > 0) {
       sequenceSteps.forEach((el) => {
-        this.sequenceSteps.push(new SequenceStep(el.id, el.state));
+        let step = new SequenceStep(el.id, el.state);
+        this.nodeEl.appendChild(step.getNodeEl());
+        this.sequenceSteps.push();
         this.stepsNumber++;
       });
     }
   }
 
+  getNodeEl() {
+    return this.nodeEl;
+  }
+
   addSteps(numberOfSteps) {
     for (let stepNumber = this.stepsNumber; stepNumber < this.stepsNumber + numberOfSteps; stepNumber++) {
-      this.sequenceSteps.push(new SequenceStep(stepNumber));
+      let step = new SequenceStep(stepNumber);
+      this.sequenceSteps.push(step);
+      this.nodeEl.appendChild(step.getNodeEl());
     }
     this.stepsNumber += numberOfSteps;
   }
@@ -451,12 +503,18 @@ class ChannelSequence {
   }
 
   switchStateEvry(N) {
-    this.sequenceSteps.forEach((sequenceStep) => (!((sequenceStep.id + 1) % N) ? sequenceStep.setState(true) : null));
+    this.sequenceSteps.forEach((sequenceStep) => {
+      if (sequenceStep.id % N) {
+        sequenceStep.setState(false);
+      } else {
+        sequenceStep.setState(true);
+      }
+    });
   }
 
   removeSteps(numberOfSteps) {
-    // let sequenceStepsToRemove = this.sequenceSteps.slice(stepsNumber - numberOfSteps, this.stepsNumber);
-    // sequenceStepsToRemove.forEach((el) => el.remove());
+    let sequenceStepsToRemove = this.sequenceSteps.slice(this.stepsNumber - numberOfSteps, this.stepsNumber);
+    sequenceStepsToRemove.forEach((el) => el.remove());
     this.sequenceSteps = this.sequenceSteps.slice(0, this.stepsNumber - numberOfSteps);
     this.stepsNumber -= numberOfSteps;
   }
@@ -471,13 +529,20 @@ class SequencerPattern {
   channelSequences = [];
   patternName = null;
   stepsNumber = null;
+  //
+  nodeEl = null;
 
   constructor(patternName, stepsNumber) {
+    this.nodeEl = document.createElement("div");
+    this.nodeEl.className = "sequencer-pattern";
+
     this.patternName = patternName;
     this.stepsNumber = stepsNumber;
   }
+
   addChannelSequence(channelName) {
     let newChannelSequence = new ChannelSequence(channelName, this.stepsNumber);
+    this.nodeEl.appendChild(newChannelSequence.getNodeEl());
     this.channelSequences.push(newChannelSequence);
     return newChannelSequence;
   }
@@ -501,6 +566,10 @@ class SequencerPattern {
     return this.channelSequences;
   }
 
+  getNodeEl() {
+    return this.nodeEl;
+  }
+
   export() {
     let channelSequencesArray = this.channelSequences.map((el) => el.export());
     return { channelSequences: channelSequencesArray, patternName: this.patternName, stepsNumber: this.stepsNumber };
@@ -508,16 +577,13 @@ class SequencerPattern {
 }
 
 class Channel {
-  //volume
-  //name
-  //soundSrc
-  //audiotrack
-
   volume = null;
   name = null;
   soundSrc = null;
   audiotrack = null;
   isMuted = null;
+
+  //
 
   constructor(name, soundSrc, volume) {
     this.volume = volume;
@@ -545,6 +611,10 @@ class Channel {
     }
   }
 
+  getNodeEl() {
+    return this.nodeEl;
+  }
+
   remove() {}
 
   export() {
@@ -560,8 +630,52 @@ class StepSequencer {
   bpm = 120;
   timer = null;
   lastPlayedStep = 0;
+  //
+  nodeEl = null;
 
-  constructor() {}
+  patternEl = null;
+  channesEl = null;
+  controlsEl = null;
+
+  constructor() {
+    this.nodeEl = document.createElement("div");
+    this.nodeEl.className = "step-sequencer";
+
+    this.controlsEl = document.createElement("div");
+    this.controlsEl.className = "sequencer-controls";
+
+    this.createControls();
+  }
+
+  createControls() {
+
+    let bpminput = document.createElement("input");
+    bpminput.value = 120;
+
+    this.controlsEl.appendChild(bpminput);
+
+    const btnPaly = document.createElement("button");
+    btnPaly.textContent = "play";
+    btnPaly.addEventListener("click", () => {this.play(); this.setBPM(bpminput.value)});
+    this.controlsEl.appendChild(btnPaly);
+
+    const btnAddPads = document.createElement("button");
+    btnAddPads.textContent = "add 8 pads";
+    btnAddPads.addEventListener("click", () => this.getCurretnSequencerPattern().addSequenceSteps(8));
+    this.controlsEl.appendChild(btnAddPads);
+
+    const btnRemovePads = document.createElement("button");
+    btnRemovePads.textContent = "delete 8 pads";
+    btnRemovePads.addEventListener("click", () => this.getCurretnSequencerPattern().removeSequenceSteps(8));
+    this.controlsEl.appendChild(btnRemovePads);
+
+    //this.updateInstrumetSelectList();
+
+    // const btnAddInstrument = document.createElement("button");
+    // btnAddInstrument.textContent = "add instrument";
+    // btnAddInstrument.addEventListener("click", () => this.addInstrument(this.selectAddInstrument.options[this.selectAddInstrument.selectedIndex].value, 1));
+    // this.controlsEl.appendChild(btnAddInstrument);
+  }
 
   addChannel(name, soundSrc, volume) {
     let newChannel = new Channel(name, soundSrc, volume);
@@ -573,7 +687,25 @@ class StepSequencer {
     let newSequencerPattern = new SequencerPattern(patternName, stepsNumber);
     this.channels.forEach((channel) => newSequencerPattern.addChannelSequence(channel.name));
     this.sequencerPatterns.push(newSequencerPattern);
+    this.switchCurrentPattern(newSequencerPattern.patternName);
     return newSequencerPattern;
+  }
+
+  switchCurrentPattern(patternName) {
+    let pattern = this.getSequencerPattern(patternName);
+    if (pattern){
+      this.currentSelectedPatternName = patternName;
+      this.patternEl = pattern.getNodeEl();
+      this.nodeEl.innerHTML = '';
+      this.draw()
+    }
+    return pattern;
+  }
+
+  draw() {
+    //this.nodeEl.appendChild(this.channesEl);
+    this.nodeEl.appendChild(this.patternEl);
+    this.nodeEl.appendChild(this.controlsEl);
   }
 
   removeChannelByName(name) {
@@ -598,11 +730,16 @@ class StepSequencer {
     return false;
   }
 
+  getSequencerPattern(patternName) {
+    return this.sequencerPatterns.find((sequencerPattern) => sequencerPattern.patternName === patternName);
+  }
+
   getCurretnSequencerPattern() {
     return this.sequencerPatterns.find((sequencerPattern) => sequencerPattern.patternName === this.currentSelectedPatternName);
   }
 
   play() {
+
     this.isPlaying = !this.isPlaying;
 
     this.lastPlayedStep = 0;
@@ -620,6 +757,8 @@ class StepSequencer {
         this.channels.forEach((channel) => {
           //console.log(this.getCurretnSequencerPattern().getChannelSequence(channel.name).getStepById(this.lastPlayedStep));
           let curretnChannelStep = this.getCurretnSequencerPattern().getChannelSequence(channel.name).getStepById(this.lastPlayedStep);
+          curretnChannelStep.setPlayingState(true);
+          setTimeout(() => curretnChannelStep.setPlayingState(false), (1000 / (this.bpm / 60) / 4));
           if (curretnChannelStep.state) {
             channel.playSound();
           }
@@ -628,6 +767,14 @@ class StepSequencer {
         this.lastPlayedStep++;
       }, 1000 / (this.bpm / 60) / 4);
     }
+  }
+
+  setBPM(bpm) {
+    this.bpm = bpm;
+  }
+
+  getNodeEl() {
+    return this.nodeEl;
   }
 
   export() {
@@ -645,10 +792,13 @@ class DrumPad {
 class DigitalAudioWorkstation {
   drumPad = null;
   stepSequencer = null;
+  //
+  nodeEl = null;
 
   constructor() {
     this.stepSequencer = new StepSequencer();
     this.drumPad = new DrumPad();
+
     //!HARDCODE
     this.stepSequencer.addChannel(
       "cowbell",
@@ -665,10 +815,25 @@ class DigitalAudioWorkstation {
     this.stepSequencer.getCurretnSequencerPattern().getChannelSequence("cowbell").switchStateEvry(2);
     this.stepSequencer.getCurretnSequencerPattern().getChannelSequence("kick").switchStateEvry(8);
     console.log(this.stepSequencer);
+
+    this.nodeEl = document.createElement("div");
+    this.nodeEl.className = "daw-container";
+
+    document.getElementsByTagName("main")[0].append(this.nodeEl);
+    this.render();
   }
 
   export() {
     return { drumPad: this.drumPad.export(), stepSequencer: this.stepSequencer.export() };
+  }
+
+  getNodeEl() {
+    return this.nodeEl;
+  }
+
+  render() {
+    this.nodeEl.innerHTML = '';
+    this.nodeEl.appendChild(this.stepSequencer.getNodeEl());
   }
 
   importFromJsonString(jsonString) {
@@ -683,13 +848,16 @@ class DigitalAudioWorkstation {
       if (importObj.stepSequencer.sequencerPatterns.length > 0) {
         importObj.stepSequencer.sequencerPatterns.forEach((sequencerPattern) => {
           let newsequencerPattern = this.stepSequencer.addSequencerPattern(sequencerPattern.patternName, sequencerPattern.stepsNumber);
-          sequencerPattern.channelSequences.forEach( channelSequences => {
-            channelSequences.sequenceSteps.forEach( step => newsequencerPattern.getChannelSequence(channelSequences.channelName).getStepById(step.id).setState(step.state));
-          })
+          sequencerPattern.channelSequences.forEach((channelSequences) => {
+            channelSequences.sequenceSteps.forEach((step) =>
+              newsequencerPattern.getChannelSequence(channelSequences.channelName).getStepById(step.id).setState(step.state)
+            );
+          });
         });
-        this.stepSequencer.currentSelectedPatternName = this.stepSequencer.sequencerPatterns[0].patternName;
+        this.stepSequencer.switchCurrentPattern(this.stepSequencer.sequencerPatterns[0].patternName);
       }
     }
+    this.render();
   }
 
   loadFile(fileContent) {}
