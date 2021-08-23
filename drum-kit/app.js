@@ -523,6 +523,7 @@ class ChannelSequence {
 
   remove() {
     this.sequenceSteps.forEach((sequenceStep) => sequenceStep.remove());
+    this.nodeEl.remove();
     this.sequenceSteps = null;
   }
 
@@ -655,6 +656,11 @@ class Channel {
       this.audiotrack.volume = this.volume;
       this.audiotrack.play();
     }
+  }
+
+  stopSound() {
+    this.audiotrack.pause();
+    this.audiotrack.currentTime = 0;
   }
 
   getNodeEl() {
@@ -835,7 +841,7 @@ class StepSequencer {
     let name = document.createElement("input");
     name.placeholder = "Unique channel name"
     let srcLink = document.createElement("input");
-    srcLink.placeholder = "http or htts full link for mp3 or ..."
+    srcLink.placeholder = "http or htts full link for mp3 or"
     let buttonAdd = document.createElement("button");
     buttonAdd.innerText = "Add channel";
     let buttonCancel = document.createElement("button");
@@ -867,6 +873,11 @@ class StepSequencer {
         if (this.isPlaying === false) {
           clearInterval(this.timer);
           this.timer = null;
+
+          this.channels.forEach((channel) => {
+            channel.stopSound();
+          });
+
           return;
         }
         if (this.lastPlayedStep >= this.getCurretnSequencerPattern().stepsNumber) {
@@ -884,6 +895,14 @@ class StepSequencer {
         });
 
         this.lastPlayedStep++;
+        let widthEl = this.getCurretnSequencerPattern().getNodeEl().getBoundingClientRect().width;
+        if (Math.ceil(((widthEl / 20)/2)) < this.lastPlayedStep) {
+          this.getCurretnSequencerPattern().getNodeEl().scrollLeft = (20 * (this.lastPlayedStep - Math.ceil(((widthEl / 20)/2))));
+        }
+        if (this.lastPlayedStep === 1) {
+          this.getCurretnSequencerPattern().getNodeEl().scrollLeft = 0;
+        } 
+        //this.getCurretnSequencerPattern().getNodeEl().scrollLeft = 20 * this.lastPlayedStep;
       }, 1000 / (this.bpm / 60) / 4);
     }
   }

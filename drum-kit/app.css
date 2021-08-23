@@ -4,7 +4,6 @@
   box-sizing: border-box;
   margin: 0;
   padding: 0;
-  scroll-behavior: smooth;
 }
 
 body {
@@ -105,21 +104,34 @@ main {
 .daw-container {
   background: rgb(255 255 255 / 50%);
   padding: 10px;
+  position: relative;
+  width: 100%;
+  backdrop-filter: blur(8px);
 }
 .step-sequencer {
   display: flex;
   flex-direction: column;
+  /* overflow: auto hidden; */
+  width: 100%;
 }
 .sequencer-pattern {
+    overflow-x: auto;
+    /* width: 1000px; */
+    /* position: relative; */
+    /* width: 30%; */
+    /* overflow: auto; */
+    /* min-width: 600px; */
+    /* width: 800px; */
+    /* scroll-behavior: smooth; */
 }
 .channel-sequence {
   display: flex;
   align-items: flex-end;
-  justify-content: flex-end;
 }
 .sequence-step {
   height: 16px;
   width: 16px;
+  min-width: 16px;
   margin: 2px;
 }
 .sequence-step_black {
@@ -145,6 +157,10 @@ main {
 }
 .channel__name {
   margin-right: 16px;
+  text-align: right;
+  max-height: 20px;
+  overflow: hidden;
+  min-width: 150px;
 }
 .channel__volume-slider {
   margin-right: 8px;
@@ -152,6 +168,7 @@ main {
 
 .sequencer-body {
   display: flex;
+  /* width: 80%; */
 }
 .channel__volume-mute {
   margin-right: 8px;
@@ -225,6 +242,8 @@ main {
   width: 16px;
   height: 16px;
   font-size: 0px;
-  background-image: url(assets/icons/svg/remove.svg); /* background-size: cover; */
+  background-image: url(assets/icons/svg/remove.svg);
+  background-size: cover;
   background-position: center;
+  min-width: 16px;
 }
