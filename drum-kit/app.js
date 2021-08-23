@@ -833,7 +833,9 @@ class StepSequencer {
     modalEl.classList.add("modal-window_add-instrument");
 
     let name = document.createElement("input");
+    name.placeholder = "Unique channel name"
     let srcLink = document.createElement("input");
+    srcLink.placeholder = "http or htts full link for mp3 or ..."
     let buttonAdd = document.createElement("button");
     buttonAdd.innerText = "Add channel";
     let buttonCancel = document.createElement("button");
@@ -935,7 +937,7 @@ class DigitalAudioWorkstation {
     this.stepSequencer.currentSelectedPatternName = "1";
     // this.stepSequencer.getCurretnSequencerPattern().getChannelSequence("cowbell").switchStateEvry(2);
     // this.stepSequencer.getCurretnSequencerPattern().getChannelSequence("kick").switchStateEvry(8);
-    console.log(this.stepSequencer);
+    //console.log(this.stepSequencer);
     //!HARDCODE<
 
     this.nodeEl = document.createElement("div");
@@ -968,18 +970,22 @@ class DigitalAudioWorkstation {
     btnImportFile.classList.add("daw-controls__button-import");
     btnImportFile.type = "file";
     btnImportFile.textContent = "Import File";
-    btnImportFile.addEventListener("change", (e) => {
-      let file = e.target.files[0];
-      if (!file) {
-        return;
-      }
-      let reader = new FileReader();
-      reader.onload = (e) => {
-        let contents = e.target.result;
-        this.importFromJsonString(contents);
-      };
-      reader.readAsText(file);
-    }, false);
+    btnImportFile.addEventListener(
+      "change",
+      (e) => {
+        let file = e.target.files[0];
+        if (!file) {
+          return;
+        }
+        let reader = new FileReader();
+        reader.onload = (e) => {
+          let contents = e.target.result;
+          this.importFromJsonString(contents);
+        };
+        reader.readAsText(file);
+      },
+      false
+    );
     this.controlsEl.appendChild(btnImportFile);
 
     // const btnAddSteps = document.createElement("button");
@@ -1039,7 +1045,21 @@ class DigitalAudioWorkstation {
     this.render();
   }
 
-  loadFile(fileContent) {}
+  loadFileFromUrl(url) {
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", url, true);
+    xhr.responseType = "text";
+    xhr.onload = () => {
+      var status = xhr.status;
+      if (status === 200) {
+        this.importFromJsonString(xhr.response);
+        return true;
+      } else {
+        return false;
+      }
+    };
+    xhr.send();
+  }
 
   saveFile(fileName) {
     const a = document.createElement("a");
@@ -1054,4 +1074,18 @@ class DigitalAudioWorkstation {
 }
 
 let DAW = new DigitalAudioWorkstation();
-//console.log(DAW.saveFile("gg.json"));
+console.log(
+  "[+ 10 points] Understand the code of someone else's project, understand it, reproduce the original application. Edits and changes are allowed and welcomed if they do not worsen the appearance and functionality of the original project"
+);
+console.log("[+ 10 points] Supplement the original project with mandatory additional functionality specified in the assignment description ");
+console.log(
+  "[+ 10 points] Supplement the original project with additional functionality to choose from those listed in the description of the task, or invented by you yourself - 10 points for each quality improvement from those proposed in the task or your own, similar to them in complexity"
+);
+
+console.log("==============");
+console.log('If you are really wanna see "DrumKit", so check out my legacy code and call\nthis.drumKit = new DrumKit(keysArray);');
+
+console.log("To open sample project call:\nDAW.loadFileFromUrl('https://api.npoint.io/adda9cae0ffdff9d395a');");
+
+console.log("Fetures: \n save and import your project from file \n varrible BPM \n varible valume for evry channel \n mut channel function \n basic step stepSequencer function \n add and remove steps \n add custom channels and remove useless");
+console.log("Share with friends, rs-chat, cat, grandmother, imaginary friend! Enjoy!\nbrougth for you by thirdmadman  with love lack of sleep and lots of coffe.");
