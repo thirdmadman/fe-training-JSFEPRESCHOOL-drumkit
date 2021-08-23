@@ -140,12 +140,91 @@ main {
 .channel {
   display: flex;
   justify-content: flex-end;
+  min-height: 20px;
+  align-items: center;
 }
 .channel__name {
+  margin-right: 16px;
 }
 .channel__volume-slider {
+  margin-right: 8px;
 }
 
 .sequencer-body {
   display: flex;
+}
+.channel__volume-mute {
+  margin-right: 8px;
+}
+
+.sequencer-controls {
+  margin: 20px 0;
+  display: flex;
+}
+
+.sequencer-controls__bpm-input {
+  text-align: center;
+  max-width: 45px;
+}
+.sequencer-controls__button-play {
+  all: unset;
+  width: 30px;
+  height: 30px;
+  text-align: center;
+  font-size: 0px;
+
+  background-repeat: no-repeat;
+  background-position: center;
+}
+.sequencer-controls__button-play_pause {
+  background-image: url(assets/icons/svg/pause.svg);
+}
+
+.sequencer-controls__button-play_play {
+  background-image: url(assets/icons/svg/play.svg);
+}
+
+.sequencer-controls__button-add-steps {
+  all: unset;
+  width: 30px;
+  height: 30px;
+  text-align: center;
+  font-size: 0px;
+  background-image: url(assets/icons/svg/add.svg);
+  background-repeat: no-repeat;
+  background-position: center;
+}
+.sequencer-controls__button-remove-steps {
+  all: unset;
+  width: 30px;
+  height: 30px;
+  text-align: center;
+  font-size: 0px;
+  background-image: url(assets/icons/svg/remove.svg);
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.modal-window {
+}
+
+.modal-window_add-instrument {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  display: flex;
+  flex-direction: column;
+  min-width: 320px;
+  background: #ffffff;
+  padding: 20px;
+}
+
+.sequencer-controls__button-remove-channel {
+  all: unset;
+  margin-right: 16px;
+  width: 16px;
+  height: 16px;
+  font-size: 0px;
+  background-image: url(assets/icons/svg/remove.svg); /* background-size: cover; */
+  background-position: center;
 }
