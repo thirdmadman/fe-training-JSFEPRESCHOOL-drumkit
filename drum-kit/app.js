@@ -921,6 +921,16 @@ class StepSequencer {
     let sequencerPatternsArray = this.sequencerPatterns.map((el) => el.export());
     return { channels: channelsArray, sequencerPatterns: sequencerPatternsArray, bpm: this.bpm };
   }
+
+  remove() {
+    this.isPlaying = false;
+    clearInterval(this.timer);
+    this.channels.forEach((channel) => {
+      channel.stopSound();
+    });
+    this.channels = null;
+    this.sequencerPatterns = null;
+  }
 }
 
 class DrumPad {
@@ -1042,6 +1052,7 @@ class DigitalAudioWorkstation {
 
   importFromJsonString(jsonString) {
     const importObj = JSON.parse(jsonString);
+    this.stepSequencer.remove();
     this.stepSequencer = new StepSequencer();
     this.drumPad = new DrumPad();
 
@@ -1102,9 +1113,9 @@ console.log(
 );
 
 console.log("==============");
-console.log('If you are really wanna see "DrumKit", so check out my legacy code and call\nthis.drumKit = new DrumKit(keysArray);');
+console.log('If you are really wanna see "DrumKit", so check out my legacy code and call\nlet drumKit = new DrumKit(keysArray);');
 
-console.log("To open sample project call:\nDAW.loadFileFromUrl('https://api.npoint.io/adda9cae0ffdff9d395a');");
+console.log("To open sample project call:\nDAW.loadFileFromUrl('https://api.npoint.io/adda9cae0ffdff9d395a');\nor\nDAW.loadFileFromUrl('https://api.npoint.io/166802b5a42fe68d24bd');");
 
-console.log("Fetures: \n save and import your project from file \n varrible BPM \n varible valume for evry channel \n mut channel function \n basic step stepSequencer function \n add and remove steps \n add custom channels and remove useless");
+console.log("Fetures: \n Add your own sounds via \"Add Channel\" button or remove existing channels! \n Save and import your project from file \n Varrible BPM \n Variable volume for every channel \n Mute channel function \n Basic step Step Sequencer function");
 console.log("Share with friends, rs-chat, cat, grandmother, imaginary friend! Enjoy!\nbrougth for you by thirdmadman  with love lack of sleep and lots of coffe.");
