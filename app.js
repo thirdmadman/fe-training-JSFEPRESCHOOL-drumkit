@@ -1,61 +1,61 @@
 let keysArray = [
   {
-    keyBind: "a",
-    soundName: "clap",
-    soundSrc: "assets/sounds/clap.wav",
+    keyBind: 'a',
+    soundName: 'clap',
+    soundSrc: 'assets/sounds/clap.wav',
   },
   {
-    keyBind: "s",
-    soundName: "hihat",
-    soundSrc: "assets/sounds/hihat.wav",
+    keyBind: 's',
+    soundName: 'hihat',
+    soundSrc: 'assets/sounds/hihat.wav',
   },
   {
-    keyBind: "d",
-    soundName: "kick",
-    soundSrc: "assets/sounds/kick.wav",
+    keyBind: 'd',
+    soundName: 'kick',
+    soundSrc: 'assets/sounds/kick.wav',
   },
   {
-    keyBind: "f",
-    soundName: "openhat",
-    soundSrc: "assets/sounds/openhat.wav",
+    keyBind: 'f',
+    soundName: 'openhat',
+    soundSrc: 'assets/sounds/openhat.wav',
   },
   {
-    keyBind: "g",
-    soundName: "boom",
-    soundSrc: "assets/sounds/boom.wav",
+    keyBind: 'g',
+    soundName: 'boom',
+    soundSrc: 'assets/sounds/boom.wav',
   },
   {
-    keyBind: "h",
-    soundName: "ride",
-    soundSrc: "assets/sounds/ride.wav",
+    keyBind: 'h',
+    soundName: 'ride',
+    soundSrc: 'assets/sounds/ride.wav',
   },
   {
-    keyBind: "j",
-    soundName: "snare",
-    soundSrc: "assets/sounds/snare.wav",
+    keyBind: 'j',
+    soundName: 'snare',
+    soundSrc: 'assets/sounds/snare.wav',
   },
   {
-    keyBind: "k",
-    soundName: "tom",
-    soundSrc: "assets/sounds/tom.wav",
+    keyBind: 'k',
+    soundName: 'tom',
+    soundSrc: 'assets/sounds/tom.wav',
   },
   {
-    keyBind: "l",
-    soundName: "tink",
-    soundSrc: "assets/sounds/tink.wav",
+    keyBind: 'l',
+    soundName: 'tink',
+    soundSrc: 'assets/sounds/tink.wav',
   },
   {
-    keyBind: "p",
-    soundName: "cowbell",
-    soundSrc: "https://d9olupt5igjta.cloudfront.net/samples/sample_files/68698/8d9c078a6497811bab1126448f956fceea3c618f/mp3/_X-808CB2.mp3?1617246270",
+    keyBind: 'p',
+    soundName: 'cowbell',
+    soundSrc: 'https://d9olupt5igjta.cloudfront.net/samples/sample_files/68698/8d9c078a6497811bab1126448f956fceea3c618f/mp3/_X-808CB2.mp3?1617246270',
   },
 ];
 class DrumKit {
-  drumkitKeys = [];
+  drumKitKeys = [];
   audioTracksMinPalyTime = 0.001;
   keysArray = null;
 
-  drumkitContainer = null;
+  drumKitContainer = null;
 
   constructor(keysArray) {
     this.createKeys(keysArray);
@@ -63,67 +63,62 @@ class DrumKit {
   }
 
   createKeys(arrayOfKeys) {
-    if (!this.drumkitContainer) {
-      this.drumkitContainer = document.createElement("div");
-      this.drumkitContainer.className = "drum-kit-key-container";
-      document.getElementsByTagName("main")[0].append(this.drumkitContainer);
+    if (!this.drumKitContainer) {
+      this.drumKitContainer = document.createElement('div');
+      this.drumKitContainer.className = 'drum-kit-key-container';
+      document.getElementsByTagName('main')[0].append(this.drumKitContainer);
     }
 
     arrayOfKeys.forEach((el) => {
-      let insertKey = document.createElement("div");
-      let keyName = document.createElement("h2");
+      let insertKey = document.createElement('div');
+      let keyName = document.createElement('h2');
       keyName.innerText = el.keyBind;
-      let soundName = document.createElement("span");
+      let soundName = document.createElement('span');
       soundName.innerText = el.soundName;
       insertKey.append(keyName);
       insertKey.append(soundName);
-      insertKey.className = "drum-kit__key";
+      insertKey.className = 'drum-kit__key';
 
-      insertKey.addEventListener("click", () => {
-        let drumkitKey = this.drumkitKeys.find((key) => key.keyBind === el.keyBind);
-        //if (drumkitKey.audiotrack.paused) {
-        //if ((drumkitKey.audiotrack.currentTime >= this.audioTracksMinPalyTime && !drumkitKey.audiotrack.paused) || drumkitKey.audiotrack.paused) {
-        drumkitKey.audiotrack.currentTime = 0;
+      insertKey.addEventListener('click', () => {
+        let drumKitKey = this.drumKitKeys.find((key) => key.keyBind === el.keyBind);
+        drumKitKey.audioTrack.currentTime = 0;
 
-        drumkitKey.audiotrack.play();
-        drumkitKey.keyEl.classList.add("keydown");
-        setTimeout(() => drumkitKey.keyEl.classList.remove("keydown"), 100);
-        //}
+        drumKitKey.audioTrack.play();
+        drumKitKey.keyEl.classList.add('keydown');
+        setTimeout(() => drumKitKey.keyEl.classList.remove('keydown'), 100);
       });
 
-      document.addEventListener("keydown", (e) => {
-        if (e.code === "Key" + el.keyBind.toUpperCase()) {
-          this.drumkitKeys.find((key) => "Key" + key.keyBind.toUpperCase() === e.code).keyEl.click();
+      document.addEventListener('keydown', (e) => {
+        if (e.code === 'Key' + el.keyBind.toUpperCase()) {
+          this.drumKitKeys.find((key) => 'Key' + key.keyBind.toUpperCase() === e.code).keyEl.click();
         }
       });
 
-      this.drumkitKeys.push({ keyBind: el.keyBind, soundName: el.soundName, keyEl: insertKey, audiotrack: new Audio(el.soundSrc) });
-      this.drumkitContainer.append(insertKey);
+      this.drumKitKeys.push({keyBind: el.keyBind, soundName: el.soundName, keyEl: insertKey, audioTrack: new Audio(el.soundSrc)});
+      this.drumKitContainer.append(insertKey);
     });
   }
 
   deleteKeyBySoundName(soundName) {
-    this.drumkitKeys.find((el) => el.soundName === soundName).keyEl.remove();
-    this.drumkitKeys = this.drumkitKeys.filter((el) => el.soundName !== soundName);
+    this.drumKitKeys.find((el) => el.soundName === soundName).keyEl.remove();
+    this.drumKitKeys = this.drumKitKeys.filter((el) => el.soundName !== soundName);
   }
 
   export() {
-    // let out = {};
-    // this.drumkitKeys.forEach( el => );
     return this.keysArray;
   }
 
   deleteAll() {
-    this.drumkitKeys.forEach((el) => this.deleteKeyBySoundName(el.soundName));
+    this.drumKitKeys.forEach((el) => this.deleteKeyBySoundName(el.soundName));
   }
 }
 
 class DrumKitInstrumentPads {
-  colorActive = "#e74c3c";
+  colorActive = '#e74c3c';
   isPlaying = false;
   instrumentName = null;
   instrumentPads = [];
-  drumkitInstrumentsContainer = null;
+  drumKitInstrumentsContainer = null;
   instrumentContainer = null;
   instrumentContainerPads = null;
   volInput = null;
@@ -133,26 +128,26 @@ class DrumKitInstrumentPads {
   constructor(instrumentName, size, volume) {
     this.instrumentName = instrumentName;
     this.SQUARES = size;
-    this.drumkitInstrumentsContainer = document.getElementsByClassName("drum-kit-rhythm-container")[0];
-    console.log(!this.drumkitInstrumentsContainer);
-    if (!this.drumkitInstrumentsContainer) {
-      this.drumkitInstrumentsContainer = document.createElement("div");
-      this.drumkitInstrumentsContainer.className = "drum-kit-rhythm-container";
-      document.getElementsByTagName("main")[0].append(this.drumkitInstrumentsContainer);
+    this.drumKitInstrumentsContainer = document.getElementsByClassName('drum-kit-rhythm-container')[0];
+    console.log(!this.drumKitInstrumentsContainer);
+    if (!this.drumKitInstrumentsContainer) {
+      this.drumKitInstrumentsContainer = document.createElement('div');
+      this.drumKitInstrumentsContainer.className = 'drum-kit-rhythm-container';
+      document.getElementsByTagName('main')[0].append(this.drumKitInstrumentsContainer);
     }
 
-    this.instrumentContainer = document.createElement("div");
-    this.instrumentContainer.className = "drum-kit-rhythm-instrument-container";
+    this.instrumentContainer = document.createElement('div');
+    this.instrumentContainer.className = 'drum-kit-rhythm-instrument-container';
 
-    this.volInput = document.createElement("input");
+    this.volInput = document.createElement('input');
     this.volInput.value = volume;
-    this.volInput.type = "range";
-    this.volInput.min = "0";
-    this.volInput.max = "1";
-    this.volInput.step = "0.01";
+    this.volInput.type = 'range';
+    this.volInput.min = '0';
+    this.volInput.max = '1';
+    this.volInput.step = '0.01';
 
     this.instrumentContainer.appendChild(this.volInput);
-    const instrumentNameEl = document.createElement("span");
+    const instrumentNameEl = document.createElement('span');
     instrumentNameEl.textContent = this.instrumentName;
     this.instrumentContainer.appendChild(instrumentNameEl);
 
@@ -161,42 +156,34 @@ class DrumKitInstrumentPads {
 
   addPads(numberOfPads) {
     if (!this.instrumentContainerPads) {
-      this.instrumentContainerPads = document.createElement("div");
-      this.instrumentContainerPads.className = "instrument-pads-container";
+      this.instrumentContainerPads = document.createElement('div');
+      this.instrumentContainerPads.className = 'instrument-pads-container';
     }
 
-    let padsNumer = this.instrumentPads.length;
+    let padsNumber = this.instrumentPads.length;
 
-    for (let i = padsNumer; i < padsNumer + numberOfPads; i++) {
-      const square = document.createElement("div");
-      square.classList.add("drum-kit-rhythm__pad");
+    for (let i = padsNumber; i < padsNumber + numberOfPads; i++) {
+      const square = document.createElement('div');
+      square.classList.add('drum-kit-rhythm__pad');
 
-      // if ((i + 8) % 8 > 3) {
-      //   square.classList.add("drum-kit-rhythm_fouth");
-      // }
-
-      //if ((i + 24) % 16 > 7) {
       if ((i + 8) % 8 > 3) {
-        square.classList.add("pad_black");
+        square.classList.add('pad_black');
       } else {
-        square.classList.add("pad_gray");
+        square.classList.add('pad_gray');
       }
 
-      this.instrumentPads.push({ id: i, state: false, padEl: square });
+      this.instrumentPads.push({id: i, state: false, padEl: square});
 
-      square.addEventListener("click", () => this.switchState(i));
+      square.addEventListener('click', () => this.switchState(i));
 
-      //square.addEventListener("mouseout", () => this.removeColor(square));
       this.instrumentContainerPads.appendChild(square);
     }
     this.instrumentContainer.appendChild(this.instrumentContainerPads);
-    this.drumkitInstrumentsContainer.append(this.instrumentContainer);
+    this.drumKitInstrumentsContainer.append(this.instrumentContainer);
   }
 
   removePads(numberOfPads) {
     if (numberOfPads > 0 && this.instrumentPads !== null && this.instrumentPads.length >= numberOfPads) {
-      // this.instrumentPads.forEach( (el, i) => i > this.instrumentPads.length - numberOfPads -1 ? el.padEl.remove() : null);
-      // this.instrumentPads.forEach( (el, i) => i > this.instrumentPads.length - numberOfPads - 1? delete this.instrumentPads[i] : null);
       let padToRemove = this.instrumentPads.slice(this.instrumentPads.length - numberOfPads, this.instrumentPads.length);
       padToRemove.forEach((el) => el.padEl.remove());
       this.instrumentPads = this.instrumentPads.slice(0, this.instrumentPads.length - numberOfPads);
@@ -213,15 +200,11 @@ class DrumKitInstrumentPads {
   switchState(padId) {
     let padObj = this.instrumentPads.find((el) => el.id === padId);
     if (!padObj.state) {
-      padObj.padEl.classList.remove("pad_black");
-      padObj.padEl.classList.add("pad_red");
-      //padObj.padEl.style.background = this.colorActive;
-      //padObj.padEl.style.boxShadow = `0 0 2px ${this.colorActive}, 0 0 10px ${this.colorActive}`;
+      padObj.padEl.classList.remove('pad_black');
+      padObj.padEl.classList.add('pad_red');
     } else {
-      padObj.padEl.classList.remove("pad_red");
-      padObj.padEl.classList.add("pad_black");
-      //padObj.padEl.style.background = "#1d1d1d";
-      //padObj.padEl.style.boxShadow = "0 0 2px #000";
+      padObj.padEl.classList.remove('pad_red');
+      padObj.padEl.classList.add('pad_black');
     }
     padObj.state = !padObj.state;
   }
@@ -236,19 +219,18 @@ class DrumKitInstrumentPads {
           this.instrumentTimer = null;
           return;
         }
+
         if (lastPlayedPadId >= this.instrumentPads.length) {
           lastPlayedPadId = 0;
         }
-        //this.instrumentPads.find((el) => el.id === (lastPlayedPadId -1)).padEl.classList.remove("pad_current-playing");
-        //let lastPadEl = this.instrumentPads.find((el) => el.id === lastPlayedPadId );
 
         let lastPadEl = this.instrumentPads.find((el) => el.id === lastPlayedPadId);
-        lastPadEl.padEl.classList.add("pad_current-playing");
-        setTimeout(() => lastPadEl.padEl.classList.remove("pad_current-playing"), interval);
-        //console.log(lastPadEl);
+        lastPadEl.padEl.classList.add('pad_current-playing');
+        setTimeout(() => lastPadEl.padEl.classList.remove('pad_current-playing'), interval);
+
         if (this.instrumentPads.find((el) => el.id === lastPlayedPadId).state) {
-          let drumKitObj = drumKit.drumkitKeys.find((el) => el.soundName === this.instrumentName);
-          drumKitObj.audiotrack.volume = this.volInput.value;
+          let drumKitObj = drumKit.drumKitKeys.find((el) => el.soundName === this.instrumentName);
+          drumKitObj.audioTrack.volume = this.volInput.value;
           drumKitObj.keyEl.click();
         }
         lastPlayedPadId++;
@@ -257,15 +239,15 @@ class DrumKitInstrumentPads {
   }
 
   export() {
-    let out = { instrumentName: this.instrumentName, valueLevel: this.volInput.value, pads: [] };
-    this.instrumentPads.forEach((el) => out.pads.push({ id: el.id, state: el.state }));
+    let out = {instrumentName: this.instrumentName, valueLevel: this.volInput.value, pads: []};
+    this.instrumentPads.forEach((el) => out.pads.push({id: el.id, state: el.state}));
     return out;
   }
 }
 
 class DrumKitRhythm {
   instruments = [];
-  bpminput = null;
+  bpmInput = null;
   size = 0;
   drumKit = null;
   selectAddInstrument = null;
@@ -274,49 +256,47 @@ class DrumKitRhythm {
     this.drumKit = new DrumKit(instrumentsArray);
 
     this.size = size;
-    //instrumentsArray.forEach((el) => this.addInstrument(el.soundName, this.size));
 
     this.instrumentsArray = instrumentsArray;
 
-    this.bpminput = document.createElement("input");
-    this.bpminput.value = 120;
+    this.bpmInput = document.createElement('input');
+    this.bpmInput.value = 120;
 
-    document.getElementsByTagName("main")[0].appendChild(this.bpminput);
+    document.getElementsByTagName('main')[0].appendChild(this.bpmInput);
 
-    const btnPaly = document.createElement("button");
-    btnPaly.textContent = "play";
-    btnPaly.addEventListener("click", () => this.playAll());
-    document.getElementsByTagName("main")[0].appendChild(btnPaly);
+    const btnPaly = document.createElement('button');
+    btnPaly.textContent = 'play';
+    btnPaly.addEventListener('click', () => this.playAll());
+    document.getElementsByTagName('main')[0].appendChild(btnPaly);
 
-    const btnAddPads = document.createElement("button");
-    btnAddPads.textContent = "add 8 pads";
-    btnAddPads.addEventListener("click", () => this.addPads(8));
-    document.getElementsByTagName("main")[0].appendChild(btnAddPads);
+    const btnAddPads = document.createElement('button');
+    btnAddPads.textContent = 'add 8 pads';
+    btnAddPads.addEventListener('click', () => this.addPads(8));
+    document.getElementsByTagName('main')[0].appendChild(btnAddPads);
 
-    const btnRemovePads = document.createElement("button");
-    btnRemovePads.textContent = "delete 8 pads";
-    btnRemovePads.addEventListener("click", () => this.removePads(8));
-    document.getElementsByTagName("main")[0].appendChild(btnRemovePads);
+    const btnRemovePads = document.createElement('button');
+    btnRemovePads.textContent = 'delete 8 pads';
+    btnRemovePads.addEventListener('click', () => this.removePads(8));
+    document.getElementsByTagName('main')[0].appendChild(btnRemovePads);
 
-    this.updateInstrumetSelectList();
+    this.updateInstrumentSelectList();
 
-    const btnAddInstrument = document.createElement("button");
-    btnAddInstrument.textContent = "add instrument";
-    btnAddInstrument.addEventListener("click", () => this.addInstrument(this.selectAddInstrument.options[this.selectAddInstrument.selectedIndex].value, 1));
-    document.getElementsByTagName("main")[0].appendChild(btnAddInstrument);
+    const btnAddInstrument = document.createElement('button');
+    btnAddInstrument.textContent = 'add instrument';
+    btnAddInstrument.addEventListener('click', () => this.addInstrument(this.selectAddInstrument.options[this.selectAddInstrument.selectedIndex].value, 1));
+    document.getElementsByTagName('main')[0].appendChild(btnAddInstrument);
   }
 
-  updateInstrumetSelectList() {
+  updateInstrumentSelectList() {
     if (!this.selectAddInstrument) {
-      this.selectAddInstrument = document.createElement("select");
-      document.getElementsByTagName("main")[0].appendChild(this.selectAddInstrument);
+      this.selectAddInstrument = document.createElement('select');
+      document.getElementsByTagName('main')[0].appendChild(this.selectAddInstrument);
     } else {
-      this.selectAddInstrument.innerText = "";
+      this.selectAddInstrument.innerText = '';
     }
-    //console.log(this.drumKit.drumkitKeys);
 
-    this.drumKit.drumkitKeys.forEach((el) => {
-      let option = document.createElement("option");
+    this.drumKit.drumKitKeys.forEach((el) => {
+      let option = document.createElement('option');
       option.value = option.text = el.soundName;
       this.selectAddInstrument.add(option);
     });
@@ -332,7 +312,7 @@ class DrumKitRhythm {
 
   deleteKeyBySoundName(instrumentName) {
     this.drumKit.deleteKeyBySoundName(instrumentName);
-    this.updateInstrumetSelectList();
+    this.updateInstrumentSelectList();
     this.deleteInstrumentBySoundName(instrumentName);
   }
 
@@ -347,7 +327,7 @@ class DrumKitRhythm {
   }
 
   playAll() {
-    this.instruments.forEach((el) => el.play(1000 / (this.bpminput.value / 60) / 4));
+    this.instruments.forEach((el) => el.play(1000 / (this.bpmInput.value / 60) / 4));
   }
 
   addInstrument(instrumentName, volume) {
@@ -359,18 +339,17 @@ class DrumKitRhythm {
   deleteInstrumentBySoundName(instrumentName) {
     this.instruments.find((el) => el.instrumentName === instrumentName).remove();
     this.instruments = this.instruments.filter((el) => el.instrumentName !== instrumentName);
-    //this.drumkitKeys = this.drumkitKeys.filter((el) => el.soundName !== soundName);
   }
 
   export() {
-    let out = { padsConfig: this.drumKit.export(), instrumentsPads: [] };
+    let out = {padsConfig: this.drumKit.export(), instrumentsPads: []};
     drumKitRhythm.instruments.forEach((el) => out.instrumentsPads.push(el.export()));
     return out;
   }
 
   saveAsFile(fileName) {
-    const a = document.createElement("a");
-    const file = new Blob([JSON.stringify(drumKitRhythm.export())], { type: "text/plain" });
+    const a = document.createElement('a');
+    const file = new Blob([JSON.stringify(drumKitRhythm.export())], {type: 'text/plain'});
 
     a.href = URL.createObjectURL(file);
     a.download = fileName;
@@ -400,10 +379,6 @@ class DrumKitRhythm {
   }
 }
 
-//let drumKitRhythm = new DrumKitRhythm(keysArray, 16);
-
-//console.log(drumKitRhythm.export());
-
 class SequenceStep {
   state = null;
   id = null;
@@ -413,40 +388,40 @@ class SequenceStep {
   constructor(id, state = false) {
     this.state = Boolean(state);
     this.id = id;
-    this.nodeEl = document.createElement("div");
-    this.nodeEl.className = "sequence-step";
+    this.nodeEl = document.createElement('div');
+    this.nodeEl.className = 'sequence-step';
     this.setState(this.state);
 
-    this.nodeEl.addEventListener("click", () => {
+    this.nodeEl.addEventListener('click', () => {
       this.switchState();
     });
 
     if ((this.id + 8) % 8 > 3) {
-      this.nodeEl.classList.add("sequence-step_black");
+      this.nodeEl.classList.add('sequence-step_black');
     } else {
-      this.nodeEl.classList.add("sequence-step_gray");
+      this.nodeEl.classList.add('sequence-step_gray');
     }
   }
 
   switchState() {
     this.state = !this.state;
-    this.nodeEl.classList.toggle("sequence-step_active");
+    this.nodeEl.classList.toggle('sequence-step_active');
   }
 
   setState(state) {
     this.state = state;
     if (this.state) {
-      this.nodeEl.classList.add("sequence-step_active");
+      this.nodeEl.classList.add('sequence-step_active');
     } else {
-      this.nodeEl.classList.remove("sequence-step_active");
+      this.nodeEl.classList.remove('sequence-step_active');
     }
   }
 
   setPlayingState(state) {
     if (state) {
-      this.nodeEl.classList.add("sequence-step_current-playing");
+      this.nodeEl.classList.add('sequence-step_current-playing');
     } else {
-      this.nodeEl.classList.remove("sequence-step_current-playing");
+      this.nodeEl.classList.remove('sequence-step_current-playing');
     }
   }
 
@@ -459,7 +434,7 @@ class SequenceStep {
   }
 
   export() {
-    return { state: this.state, id: this.id };
+    return {state: this.state, id: this.id};
   }
 }
 
@@ -471,8 +446,8 @@ class ChannelSequence {
   nodeEl = null;
 
   constructor(channelName, stepsNumber = 0, sequenceSteps = null) {
-    this.nodeEl = document.createElement("div");
-    this.nodeEl.className = "channel-sequence";
+    this.nodeEl = document.createElement('div');
+    this.nodeEl.className = 'channel-sequence';
 
     this.channelName = channelName;
     if (stepsNumber > 0 && !sequenceSteps) {
@@ -504,7 +479,7 @@ class ChannelSequence {
     return this.sequenceSteps.find((sequenceStep) => sequenceStep.id === id);
   }
 
-  switchStateEvry(N) {
+  switchStateEvery(N) {
     this.sequenceSteps.forEach((sequenceStep) => {
       if (sequenceStep.id % N) {
         sequenceStep.setState(false);
@@ -529,7 +504,7 @@ class ChannelSequence {
 
   export() {
     let sequenceStepsArray = this.sequenceSteps.map((el) => el.export());
-    return { channelName: this.channelName, sequenceSteps: sequenceStepsArray, stepsNumber: this.stepsNumber };
+    return {channelName: this.channelName, sequenceSteps: sequenceStepsArray, stepsNumber: this.stepsNumber};
   }
 }
 
@@ -541,8 +516,8 @@ class SequencerPattern {
   nodeEl = null;
 
   constructor(patternName, stepsNumber) {
-    this.nodeEl = document.createElement("div");
-    this.nodeEl.className = "sequencer-pattern";
+    this.nodeEl = document.createElement('div');
+    this.nodeEl.className = 'sequencer-pattern';
 
     this.patternName = patternName;
     this.stepsNumber = stepsNumber;
@@ -585,7 +560,7 @@ class SequencerPattern {
 
   export() {
     let channelSequencesArray = this.channelSequences.map((el) => el.export());
-    return { channelSequences: channelSequencesArray, patternName: this.patternName, stepsNumber: this.stepsNumber };
+    return {channelSequences: channelSequencesArray, patternName: this.patternName, stepsNumber: this.stepsNumber};
   }
 }
 
@@ -593,7 +568,7 @@ class Channel {
   volume = null;
   name = null;
   soundSrc = null;
-  audiotrack = null;
+  audioTrack = null;
   isMuted = null;
 
   //
@@ -605,31 +580,31 @@ class Channel {
     this.volume = volume;
     this.name = name;
     this.soundSrc = soundSrc;
-    this.audiotrack = new Audio(this.soundSrc);
+    this.audioTrack = new Audio(this.soundSrc);
     this.isMuted = false;
 
-    this.nodeEl = document.createElement("div");
-    this.nodeEl.className = "channel";
+    this.nodeEl = document.createElement('div');
+    this.nodeEl.className = 'channel';
 
-    let nameEl = document.createElement("div");
-    nameEl.className = "channel__name";
+    let nameEl = document.createElement('div');
+    nameEl.className = 'channel__name';
     nameEl.innerText = this.name;
 
-    this.isMutedEl = document.createElement("input");
-    this.isMutedEl.type = "checkbox";
-    this.isMutedEl.className = "channel__volume-mute";
+    this.isMutedEl = document.createElement('input');
+    this.isMutedEl.type = 'checkbox';
+    this.isMutedEl.className = 'channel__volume-mute';
     this.isMutedEl.checked = false;
     this.isMutedEl.oninput = () => {
       this.setMute(this.isMutedEl.checked);
     };
 
-    this.volumeSliderEl = document.createElement("input");
-    this.volumeSliderEl.className = "channel__volume-slider";
+    this.volumeSliderEl = document.createElement('input');
+    this.volumeSliderEl.className = 'channel__volume-slider';
     this.volumeSliderEl.value = this.volume * 100;
-    this.volumeSliderEl.type = "range";
-    this.volumeSliderEl.min = "0";
-    this.volumeSliderEl.max = "100";
-    this.volumeSliderEl.step = "1";
+    this.volumeSliderEl.type = 'range';
+    this.volumeSliderEl.min = '0';
+    this.volumeSliderEl.max = '100';
+    this.volumeSliderEl.step = '1';
     this.volumeSliderEl.oninput = () => {
       this.setVolume(this.volumeSliderEl.value / 100);
     };
@@ -652,15 +627,15 @@ class Channel {
 
   playSound() {
     if (!this.isMuted) {
-      this.audiotrack.currentTime = 0;
-      this.audiotrack.volume = this.volume;
-      this.audiotrack.play();
+      this.audioTrack.currentTime = 0;
+      this.audioTrack.volume = this.volume;
+      this.audioTrack.play();
     }
   }
 
   stopSound() {
-    this.audiotrack.pause();
-    this.audiotrack.currentTime = 0;
+    this.audioTrack.pause();
+    this.audioTrack.currentTime = 0;
   }
 
   getNodeEl() {
@@ -672,7 +647,7 @@ class Channel {
   }
 
   export() {
-    return { volume: this.volume, name: this.name, soundSrc: this.soundSrc };
+    return {volume: this.volume, name: this.name, soundSrc: this.soundSrc};
   }
 }
 
@@ -684,68 +659,68 @@ class StepSequencer {
   bpm = 120;
   timer = null;
   lastPlayedStep = 0;
-  //
+
   nodeEl = null;
 
-  channesEl = null;
+  channelsEl = null;
   patternEl = null;
   bodyEl = null;
   controlsEl = null;
 
-  bpminput = null;
+  bpmInput = null;
 
   constructor() {
-    this.controlsEl = document.createElement("div");
-    this.controlsEl.className = "sequencer-controls";
+    this.controlsEl = document.createElement('div');
+    this.controlsEl.className = 'sequencer-controls';
 
-    this.bodyEl = document.createElement("div");
-    this.bodyEl.className = "sequencer-body";
+    this.bodyEl = document.createElement('div');
+    this.bodyEl.className = 'sequencer-body';
 
-    this.channesEl = document.createElement("div");
-    this.channesEl.className = "channels";
+    this.channelsEl = document.createElement('div');
+    this.channelsEl.className = 'channels';
 
-    this.nodeEl = document.createElement("div");
-    this.nodeEl.className = "step-sequencer";
+    this.nodeEl = document.createElement('div');
+    this.nodeEl.className = 'step-sequencer';
 
     this.createControls();
   }
 
   createControls() {
-    this.bpminput = document.createElement("input");
-    this.bpminput.value = this.bpm;
+    this.bpmInput = document.createElement('input');
+    this.bpmInput.value = this.bpm;
 
-    this.bpminput.classList.add("sequencer-controls__bpm-input");
+    this.bpmInput.classList.add('sequencer-controls__bpm-input');
 
-    this.controlsEl.appendChild(this.bpminput);
+    this.controlsEl.appendChild(this.bpmInput);
 
-    const btnPaly = document.createElement("button");
-    btnPaly.classList.add("sequencer-controls__button-play");
-    btnPaly.classList.add("sequencer-controls__button-play_play");
-    btnPaly.textContent = "play";
-    btnPaly.addEventListener("click", () => {
+    const btnPaly = document.createElement('button');
+    btnPaly.classList.add('sequencer-controls__button-play');
+    btnPaly.classList.add('sequencer-controls__button-play_play');
+    btnPaly.textContent = 'play';
+    btnPaly.addEventListener('click', () => {
       this.play();
-      this.setBPM(this.bpminput.value);
-      btnPaly.classList.toggle("sequencer-controls__button-play_pause");
-      btnPaly.classList.toggle("sequencer-controls__button-play_play");
+      this.setBPM(this.bpmInput.value);
+      btnPaly.classList.toggle('sequencer-controls__button-play_pause');
+      btnPaly.classList.toggle('sequencer-controls__button-play_play');
     });
     this.controlsEl.appendChild(btnPaly);
 
-    const btnAddSteps = document.createElement("button");
-    btnAddSteps.classList.add("sequencer-controls__button-add-steps");
-    btnAddSteps.textContent = "add 8 steps";
-    btnAddSteps.addEventListener("click", () => this.getCurretnSequencerPattern().addSequenceSteps(8));
+    const btnAddSteps = document.createElement('button');
+    btnAddSteps.classList.add('sequencer-controls__button-add-steps');
+    btnAddSteps.textContent = 'add 8 steps';
+    btnAddSteps.addEventListener('click', () => this.getCurrentSequencerPattern().addSequenceSteps(8));
     this.controlsEl.appendChild(btnAddSteps);
 
-    const btnRemoveSteps = document.createElement("button");
-    btnRemoveSteps.classList.add("sequencer-controls__button-remove-steps");
-    btnRemoveSteps.textContent = "remove 8 steps";
-    btnRemoveSteps.addEventListener("click", () => this.getCurretnSequencerPattern().removeSequenceSteps(8));
+    const btnRemoveSteps = document.createElement('button');
+    btnRemoveSteps.classList.add('sequencer-controls__button-remove-steps');
+    btnRemoveSteps.textContent = 'remove 8 steps';
+    btnRemoveSteps.addEventListener('click', () => this.getCurrentSequencerPattern().removeSequenceSteps(8));
     this.controlsEl.appendChild(btnRemoveSteps);
 
-    const btnAddChannel = document.createElement("button");
-    btnAddChannel.classList.add("sequencer-controls__button-add-channel");
-    btnAddChannel.textContent = "add channel";
-    btnAddChannel.addEventListener("click", () => this.showAddNewInstrument());
+    const btnAddChannel = document.createElement('button');
+    btnAddChannel.classList.add('sequencer-controls__button-add-channel');
+    btnAddChannel.textContent = 'add channel';
+    btnAddChannel.addEventListener('click', () => this.showAddNewInstrument());
     this.controlsEl.appendChild(btnAddChannel);
   }
 
@@ -753,16 +728,16 @@ class StepSequencer {
     if (!this.getChannel(name)) {
       let newChannel = new Channel(name, soundSrc, volume);
       this.channels.push(newChannel);
-      this.channesEl.appendChild(newChannel.getNodeEl());
+      this.channelsEl.appendChild(newChannel.getNodeEl());
 
-      const btnRemoveChannel = document.createElement("button");
-      btnRemoveChannel.classList.add("sequencer-controls__button-remove-channel");
-      btnRemoveChannel.textContent = "x";
-      btnRemoveChannel.addEventListener("click", () => this.removeChannelByName(name));
+      const btnRemoveChannel = document.createElement('button');
+      btnRemoveChannel.classList.add('sequencer-controls__button-remove-channel');
+      btnRemoveChannel.textContent = 'x';
+      btnRemoveChannel.addEventListener('click', () => this.removeChannelByName(name));
       newChannel.getNodeEl().appendChild(btnRemoveChannel);
 
-      if (this.getCurretnSequencerPattern()) {
-        this.getCurretnSequencerPattern().addChannelSequence(name);
+      if (this.getCurrentSequencerPattern()) {
+        this.getCurrentSequencerPattern().addChannelSequence(name);
       }
       return newChannel;
     }
@@ -788,9 +763,9 @@ class StepSequencer {
   }
 
   draw() {
-    this.nodeEl.innerHTML = "";
-    this.bodyEl.innerHTML = "";
-    this.bodyEl.appendChild(this.channesEl);
+    this.nodeEl.innerHTML = '';
+    this.bodyEl.innerHTML = '';
+    this.bodyEl.appendChild(this.channelsEl);
     this.bodyEl.appendChild(this.patternEl);
 
     this.nodeEl.appendChild(this.controlsEl);
@@ -829,23 +804,23 @@ class StepSequencer {
     return this.channels.find((channel) => channel.name === name);
   }
 
-  getCurretnSequencerPattern() {
+  getCurrentSequencerPattern() {
     return this.sequencerPatterns.find((sequencerPattern) => sequencerPattern.patternName === this.currentSelectedPatternName);
   }
 
   showAddNewInstrument() {
-    let modalEl = document.createElement("div");
-    modalEl.classList.add("modal-window");
-    modalEl.classList.add("modal-window_add-instrument");
+    let modalEl = document.createElement('div');
+    modalEl.classList.add('modal-window');
+    modalEl.classList.add('modal-window_add-instrument');
 
-    let name = document.createElement("input");
-    name.placeholder = "Unique channel name"
-    let srcLink = document.createElement("input");
-    srcLink.placeholder = "http or htts full link for mp3 or"
-    let buttonAdd = document.createElement("button");
-    buttonAdd.innerText = "Add channel";
-    let buttonCancel = document.createElement("button");
-    buttonCancel.innerText = "Cancel";
+    let name = document.createElement('input');
+    name.placeholder = 'Unique channel name';
+    let srcLink = document.createElement('input');
+    srcLink.placeholder = 'http or htts full link for mp3 or';
+    let buttonAdd = document.createElement('button');
+    buttonAdd.innerText = 'Add channel';
+    let buttonCancel = document.createElement('button');
+    buttonCancel.innerText = 'Cancel';
 
     buttonCancel.onclick = () => {
       modalEl.remove();
@@ -880,35 +855,33 @@ class StepSequencer {
 
           return;
         }
-        if (this.lastPlayedStep >= this.getCurretnSequencerPattern().stepsNumber) {
+        if (this.lastPlayedStep >= this.getCurrentSequencerPattern().stepsNumber) {
           this.lastPlayedStep = 0;
         }
 
         this.channels.forEach((channel) => {
-          //console.log(this.getCurretnSequencerPattern().getChannelSequence(channel.name));
-          let curretnChannelStep = this.getCurretnSequencerPattern().getChannelSequence(channel.name).getStepById(this.lastPlayedStep);
-          curretnChannelStep.setPlayingState(true);
-          setTimeout(() => curretnChannelStep.setPlayingState(false), 1000 / (this.bpm / 60) / 4);
-          if (curretnChannelStep.state) {
+          let currentChannelStep = this.getCurrentSequencerPattern().getChannelSequence(channel.name).getStepById(this.lastPlayedStep);
+          currentChannelStep.setPlayingState(true);
+          setTimeout(() => currentChannelStep.setPlayingState(false), 1000 / (this.bpm / 60) / 4);
+          if (currentChannelStep.state) {
             channel.playSound();
           }
         });
 
         this.lastPlayedStep++;
-        let widthEl = this.getCurretnSequencerPattern().getNodeEl().getBoundingClientRect().width;
-        if (Math.ceil(((widthEl / 20)/2)) < this.lastPlayedStep) {
-          this.getCurretnSequencerPattern().getNodeEl().scrollLeft = (20 * (this.lastPlayedStep - Math.ceil(((widthEl / 20)/2))));
+        let widthEl = this.getCurrentSequencerPattern().getNodeEl().getBoundingClientRect().width;
+        if (Math.ceil(widthEl / 20 / 2) < this.lastPlayedStep) {
+          this.getCurrentSequencerPattern().getNodeEl().scrollLeft = 20 * (this.lastPlayedStep - Math.ceil(widthEl / 20 / 2));
         }
         if (this.lastPlayedStep === 1) {
-          this.getCurretnSequencerPattern().getNodeEl().scrollLeft = 0;
-        } 
-        //this.getCurretnSequencerPattern().getNodeEl().scrollLeft = 20 * this.lastPlayedStep;
+          this.getCurrentSequencerPattern().getNodeEl().scrollLeft = 0;
+        }
       }, 1000 / (this.bpm / 60) / 4);
     }
   }
 
   setBPM(bpm) {
-    this.bpminput.value = bpm;
+    this.bpmInput.value = bpm;
     this.bpm = bpm;
   }
 
@@ -919,7 +892,7 @@ class StepSequencer {
   export() {
     let channelsArray = this.channels.map((el) => el.export());
     let sequencerPatternsArray = this.sequencerPatterns.map((el) => el.export());
-    return { channels: channelsArray, sequencerPatterns: sequencerPatternsArray, bpm: this.bpm };
+    return {channels: channelsArray, sequencerPatterns: sequencerPatternsArray, bpm: this.bpm};
   }
 
   remove() {
@@ -962,45 +935,45 @@ class DigitalAudioWorkstation {
     //   "https://d9olupt5igjta.cloudfront.net/samples/sample_files/85486/7e678db81002e109d836d4c89a200ed1c6e0cf1f/mp3/_IqBu__Kick_6_-_A.mp3?1629308763",
     //   1
     // );
-    this.stepSequencer.addSequencerPattern("1", 16);
-    this.stepSequencer.currentSelectedPatternName = "1";
-    // this.stepSequencer.getCurretnSequencerPattern().getChannelSequence("cowbell").switchStateEvry(2);
-    // this.stepSequencer.getCurretnSequencerPattern().getChannelSequence("kick").switchStateEvry(8);
+    this.stepSequencer.addSequencerPattern('1', 16);
+    this.stepSequencer.currentSelectedPatternName = '1';
+    // this.stepSequencer.getCurrentSequencerPattern().getChannelSequence("cowbell").switchStateEvry(2);
+    // this.stepSequencer.getCurrentSequencerPattern().getChannelSequence("kick").switchStateEvry(8);
     //console.log(this.stepSequencer);
     //!HARDCODE<
 
-    this.nodeEl = document.createElement("div");
-    this.nodeEl.className = "daw-container";
+    this.nodeEl = document.createElement('div');
+    this.nodeEl.className = 'daw-container';
 
-    this.controlsEl = document.createElement("div");
-    this.controlsEl.className = "daw-controls";
+    this.controlsEl = document.createElement('div');
+    this.controlsEl.className = 'daw-controls';
 
     this.createControls();
 
-    document.getElementsByTagName("main")[0].append(this.nodeEl);
+    document.getElementsByTagName('main')[0].append(this.nodeEl);
     this.render();
   }
 
   createControls() {
-    let saveFileNameinput = document.createElement("input");
-    saveFileNameinput.value = "savedProject.json";
-    saveFileNameinput.classList.add("daw-controls__savename-input");
-    this.controlsEl.appendChild(saveFileNameinput);
+    let saveFileNameInput = document.createElement('input');
+    saveFileNameInput.value = 'savedProject.json';
+    saveFileNameInput.classList.add('daw-controls__savename-input');
+    this.controlsEl.appendChild(saveFileNameInput);
 
-    const btnSaveFile = document.createElement("button");
-    btnSaveFile.classList.add("daw-controls__button-save");
-    btnSaveFile.textContent = "Save File";
-    btnSaveFile.addEventListener("click", () => {
-      this.saveFile(saveFileNameinput.value);
+    const btnSaveFile = document.createElement('button');
+    btnSaveFile.classList.add('daw-controls__button-save');
+    btnSaveFile.textContent = 'Save File';
+    btnSaveFile.addEventListener('click', () => {
+      this.saveFile(saveFileNameInput.value);
     });
     this.controlsEl.appendChild(btnSaveFile);
 
-    const btnImportFile = document.createElement("input");
-    btnImportFile.classList.add("daw-controls__button-import");
-    btnImportFile.type = "file";
-    btnImportFile.textContent = "Import File";
+    const btnImportFile = document.createElement('input');
+    btnImportFile.classList.add('daw-controls__button-import');
+    btnImportFile.type = 'file';
+    btnImportFile.textContent = 'Import File';
     btnImportFile.addEventListener(
-      "change",
+      'change',
       (e) => {
         let file = e.target.files[0];
         if (!file) {
@@ -1020,13 +993,13 @@ class DigitalAudioWorkstation {
     // const btnAddSteps = document.createElement("button");
     // btnAddSteps.classList.add("sequencer-controls__button-add-steps");
     // btnAddSteps.textContent = "add 8 steps";
-    // btnAddSteps.addEventListener("click", () => this.getCurretnSequencerPattern().addSequenceSteps(8));
+    // btnAddSteps.addEventListener("click", () => this.getCurrentSequencerPattern().addSequenceSteps(8));
     // this.controlsEl.appendChild(btnAddSteps);
 
     // const btnRemoveSteps = document.createElement("button");
     // btnRemoveSteps.classList.add("sequencer-controls__button-remove-steps");
     // btnRemoveSteps.textContent = "remove 8 steps";
-    // btnRemoveSteps.addEventListener("click", () => this.getCurretnSequencerPattern().removeSequenceSteps(8));
+    // btnRemoveSteps.addEventListener("click", () => this.getCurrentSequencerPattern().removeSequenceSteps(8));
     // this.controlsEl.appendChild(btnRemoveSteps);
 
     // const btnAddChannel = document.createElement("button");
@@ -1037,7 +1010,7 @@ class DigitalAudioWorkstation {
   }
 
   export() {
-    return { drumPad: this.drumPad.export(), stepSequencer: this.stepSequencer.export() };
+    return {drumPad: this.drumPad.export(), stepSequencer: this.stepSequencer.export()};
   }
 
   getNodeEl() {
@@ -1045,7 +1018,7 @@ class DigitalAudioWorkstation {
   }
 
   render() {
-    this.nodeEl.innerHTML = "";
+    this.nodeEl.innerHTML = '';
     this.nodeEl.appendChild(this.controlsEl);
     this.nodeEl.appendChild(this.stepSequencer.getNodeEl());
   }
@@ -1062,11 +1035,9 @@ class DigitalAudioWorkstation {
       importObj.stepSequencer.channels.forEach((channel) => this.stepSequencer.addChannel(channel.name, channel.soundSrc, channel.volume));
       if (importObj.stepSequencer.sequencerPatterns.length > 0) {
         importObj.stepSequencer.sequencerPatterns.forEach((sequencerPattern) => {
-          let newsequencerPattern = this.stepSequencer.addSequencerPattern(sequencerPattern.patternName, sequencerPattern.stepsNumber);
+          let newSequencerPattern = this.stepSequencer.addSequencerPattern(sequencerPattern.patternName, sequencerPattern.stepsNumber);
           sequencerPattern.channelSequences.forEach((channelSequences) => {
-            channelSequences.sequenceSteps.forEach((step) =>
-              newsequencerPattern.getChannelSequence(channelSequences.channelName).getStepById(step.id).setState(step.state)
-            );
+            channelSequences.sequenceSteps.forEach((step) => newSequencerPattern.getChannelSequence(channelSequences.channelName).getStepById(step.id).setState(step.state));
           });
         });
         this.stepSequencer.switchCurrentPattern(this.stepSequencer.sequencerPatterns[0].patternName);
@@ -1077,8 +1048,8 @@ class DigitalAudioWorkstation {
 
   loadFileFromUrl(url) {
     var xhr = new XMLHttpRequest();
-    xhr.open("GET", url, true);
-    xhr.responseType = "text";
+    xhr.open('GET', url, true);
+    xhr.responseType = 'text';
     xhr.onload = () => {
       var status = xhr.status;
       if (status === 200) {
@@ -1092,8 +1063,8 @@ class DigitalAudioWorkstation {
   }
 
   saveFile(fileName) {
-    const a = document.createElement("a");
-    const file = new Blob([JSON.stringify(this.export())], { type: "text/plain" });
+    const a = document.createElement('a');
+    const file = new Blob([JSON.stringify(this.export())], {type: 'text/plain'});
 
     a.href = URL.createObjectURL(file);
     a.download = fileName;
@@ -1107,15 +1078,19 @@ let DAW = new DigitalAudioWorkstation();
 console.log(
   "[+ 10 points] Understand the code of someone else's project, understand it, reproduce the original application. Edits and changes are allowed and welcomed if they do not worsen the appearance and functionality of the original project"
 );
-console.log("[+ 10 points] Supplement the original project with mandatory additional functionality specified in the assignment description ");
+console.log('[+ 10 points] Supplement the original project with mandatory additional functionality specified in the assignment description ');
 console.log(
-  "[+ 10 points] Supplement the original project with additional functionality to choose from those listed in the description of the task, or invented by you yourself - 10 points for each quality improvement from those proposed in the task or your own, similar to them in complexity"
+  '[+ 10 points] Supplement the original project with additional functionality to choose from those listed in the description of the task, or invented by you yourself - 10 points for each quality improvement from those proposed in the task or your own, similar to them in complexity'
 );
 
-console.log("==============");
+console.log('==============');
 console.log('If you are really wanna see "DrumKit", so check out my legacy code and call\nlet drumKit = new DrumKit(keysArray);');
 
-console.log("To open sample project call:\nDAW.loadFileFromUrl('https://api.npoint.io/adda9cae0ffdff9d395a');\nor\nDAW.loadFileFromUrl('https://api.npoint.io/166802b5a42fe68d24bd');");
+console.log(
+  "To open sample project call:\nDAW.loadFileFromUrl('https://api.npoint.io/adda9cae0ffdff9d395a');\nor\nDAW.loadFileFromUrl('https://api.npoint.io/166802b5a42fe68d24bd');"
+);
 
-console.log("Fetures: \n Add your own sounds via \"Add Channel\" button or remove existing channels! \n Save and import your project from file \n Varrible BPM \n Variable volume for every channel \n Mute channel function \n Basic step Step Sequencer function");
-console.log("Share with friends, rs-chat, cat, grandmother, imaginary friend! Enjoy!\nbrougth for you by thirdmadman  with love lack of sleep and lots of coffe.");
+console.log(
+  'Fetures: \n Add your own sounds via "Add Channel" button or remove existing channels! \n Save and import your project from file \n Variable BPM \n Variable volume for every channel \n Mute channel function \n Basic step Step Sequencer function'
+);
+console.log('Share with friends, rs-chat, cat, grandmother, imaginary friend! Enjoy!\nbrought for you by thirdmadman with love, lack of sleep and lots of coffee.');
