@@ -1,0 +1,250 @@
+@import url("https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500;700;900&display=swap");
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  height: 100vh;
+  font-family: "Roboto", sans-serif;
+  background: no-repeat center/cover url("https://img5.goodfon.com/original/1366x768/d/5f/rok-kontsert-stsena-siluet.jpg");
+}
+
+main {
+  display: flex;
+  flex: 1;
+  min-height: 100vh;
+  align-items: center;
+  justify-content: center;
+  background: #00000047;
+  flex-direction: column;
+}
+
+.drum-kit-key-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.drum-kit__key {
+  text-transform: uppercase;
+  border: 0.1rem solid black;
+  border-radius: 0.5rem;
+  margin: 1rem;
+  font-size: 1.5rem;
+  padding: 1rem 0.5rem;
+  transition: all 0.07s ease;
+  width: 10rem;
+  height: 10rem;
+  text-align: center;
+  color: white;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  -webkit-transition: background-color 0.3s;
+  transition: background-color 0.3s;
+}
+
+.keydown {
+  background-color: red;
+}
+
+.drum-kit-rhythm-container {
+}
+
+.drum-kit-rhythm-instrument-container {
+  display: flex;
+  justify-content: space-between;
+}
+
+.drum-kit-rhythm-instrument-container > span {
+  max-width: 100px;
+  color: #ffffff;
+  margin-right: 20px;
+}
+
+.instrument-pads-container {
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+}
+
+.drum-kit-rhythm_fouth {
+  box-shadow: inset 0px 0px 6px 1px #00ff0870;
+}
+
+.pad_black {
+  background-color: #000000;
+}
+.pad_gray {
+  background-color: #696969;
+}
+.pad_red {
+  background-color: #ff0000;
+}
+
+.pad_current-playing {
+  box-shadow: inset 0px 0px 6px 1px #ffffff;
+}
+
+.drum-kit-rhythm__pad {
+  height: 16px;
+  width: 16px;
+  margin: 2px;
+}
+
+.drum-kit-rhythm__pad:hover {
+  transition-duration: 0s;
+}
+
+/*DAW*/
+.daw-container {
+  background: rgb(255 255 255 / 50%);
+  padding: 10px;
+  position: relative;
+  width: 100%;
+  backdrop-filter: blur(8px);
+}
+.step-sequencer {
+  display: flex;
+  flex-direction: column;
+  /* overflow: auto hidden; */
+  width: 100%;
+}
+.sequencer-pattern {
+    overflow-x: auto;
+    /* width: 1000px; */
+    /* position: relative; */
+    /* width: 30%; */
+    /* overflow: auto; */
+    /* min-width: 600px; */
+    /* width: 800px; */
+    /* scroll-behavior: smooth; */
+}
+.channel-sequence {
+  display: flex;
+  align-items: flex-end;
+}
+.sequence-step {
+  height: 16px;
+  width: 16px;
+  min-width: 16px;
+  margin: 2px;
+}
+.sequence-step_black {
+  background-color: #000000;
+}
+.sequence-step_gray {
+  background-color: #696969;
+}
+.sequence-step_active {
+  background-color: #ff0000;
+}
+
+.sequence-step_current-playing {
+  box-shadow: inset 0px 0px 6px 1px #ffffff;
+}
+.channels {
+}
+.channel {
+  display: flex;
+  justify-content: flex-end;
+  min-height: 20px;
+  align-items: center;
+}
+.channel__name {
+  margin-right: 16px;
+  text-align: right;
+  max-height: 20px;
+  overflow: hidden;
+  min-width: 150px;
+}
+.channel__volume-slider {
+  margin-right: 8px;
+}
+
+.sequencer-body {
+  display: flex;
+  /* width: 80%; */
+}
+.channel__volume-mute {
+  margin-right: 8px;
+}
+
+.sequencer-controls {
+  margin: 20px 0;
+  display: flex;
+}
+
+.sequencer-controls__bpm-input {
+  text-align: center;
+  max-width: 45px;
+}
+.sequencer-controls__button-play {
+  all: unset;
+  width: 30px;
+  height: 30px;
+  text-align: center;
+  font-size: 0px;
+
+  background-repeat: no-repeat;
+  background-position: center;
+}
+.sequencer-controls__button-play_pause {
+  background-image: url(assets/icons/svg/pause.svg);
+}
+
+.sequencer-controls__button-play_play {
+  background-image: url(assets/icons/svg/play.svg);
+}
+
+.sequencer-controls__button-add-steps {
+  all: unset;
+  width: 30px;
+  height: 30px;
+  text-align: center;
+  font-size: 0px;
+  background-image: url(assets/icons/svg/add.svg);
+  background-repeat: no-repeat;
+  background-position: center;
+}
+.sequencer-controls__button-remove-steps {
+  all: unset;
+  width: 30px;
+  height: 30px;
+  text-align: center;
+  font-size: 0px;
+  background-image: url(assets/icons/svg/remove.svg);
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.modal-window {
+}
+
+.modal-window_add-instrument {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  display: flex;
+  flex-direction: column;
+  min-width: 320px;
+  background: #ffffff;
+  padding: 20px;
+}
+
+.sequencer-controls__button-remove-channel {
+  all: unset;
+  margin-right: 16px;
+  width: 16px;
+  height: 16px;
+  font-size: 0px;
+  background-image: url(assets/icons/svg/remove.svg);
+  background-size: cover;
+  background-position: center;
+  min-width: 16px;
+}
