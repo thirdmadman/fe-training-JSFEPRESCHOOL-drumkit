@@ -50,6 +50,41 @@ let keysArray = [
     soundSrc: 'https://d9olupt5igjta.cloudfront.net/samples/sample_files/68698/8d9c078a6497811bab1126448f956fceea3c618f/mp3/_X-808CB2.mp3?1617246270',
   },
 ];
+
+class ModalWindow {
+  constructor(windowTypeStyleName, windowTitle, innerEl, okButtonEl) {
+    const modalWindowOverlayEl = document.createElement('div');
+    modalWindowOverlayEl.classList.add('modal-window__overlay');
+
+    const modalWindowTitleEl = document.createElement('div');
+    modalWindowTitleEl.classList.add('modal-window__title');
+    modalWindowTitleEl.innerText = windowTitle;
+
+    const modalEl = document.createElement('div');
+    modalEl.classList.add('modal-window');
+    modalEl.classList.add(windowTypeStyleName);
+
+    const buttonCancel = document.createElement('button');
+    buttonCancel.classList.add('modal-window__button');
+    buttonCancel.classList.add('modal-window__button_cancel');
+    buttonCancel.innerText = 'x';
+
+    buttonCancel.onclick = () => {
+      modalWindowOverlayEl.remove();
+    };
+
+    okButtonEl.addEventListener('click', () => modalWindowOverlayEl.remove());
+
+    modalEl.append(modalWindowTitleEl);
+    modalEl.append(innerEl);
+    modalEl.append(okButtonEl);
+    modalEl.append(buttonCancel);
+
+    modalWindowOverlayEl.append(modalEl);
+    document.body.appendChild(modalWindowOverlayEl);
+  }
+}
+
 class DrumKit {
   drumKitKeys = [];
   audioTracksMinPalyTime = 0.001;
@@ -694,6 +729,7 @@ class StepSequencer {
     this.controlsEl.appendChild(this.bpmInput);
 
     const btnPaly = document.createElement('button');
+    btnPaly.classList.add('sequencer-controls__button');
     btnPaly.classList.add('sequencer-controls__button-play');
     btnPaly.classList.add('sequencer-controls__button-play_play');
     btnPaly.textContent = 'play';
@@ -706,20 +742,23 @@ class StepSequencer {
     this.controlsEl.appendChild(btnPaly);
 
     const btnAddSteps = document.createElement('button');
+    btnAddSteps.classList.add('sequencer-controls__button');
     btnAddSteps.classList.add('sequencer-controls__button-add-steps');
     btnAddSteps.textContent = 'add 8 steps';
     btnAddSteps.addEventListener('click', () => this.getCurrentSequencerPattern().addSequenceSteps(8));
     this.controlsEl.appendChild(btnAddSteps);
 
     const btnRemoveSteps = document.createElement('button');
+    btnRemoveSteps.classList.add('sequencer-controls__button');
     btnRemoveSteps.classList.add('sequencer-controls__button-remove-steps');
     btnRemoveSteps.textContent = 'remove 8 steps';
     btnRemoveSteps.addEventListener('click', () => this.getCurrentSequencerPattern().removeSequenceSteps(8));
     this.controlsEl.appendChild(btnRemoveSteps);
 
     const btnAddChannel = document.createElement('button');
+    btnAddChannel.classList.add('sequencer-controls__button');
     btnAddChannel.classList.add('sequencer-controls__button-add-channel');
-    btnAddChannel.textContent = 'add channel';
+    btnAddChannel.textContent = 'Add channel';
     btnAddChannel.addEventListener('click', () => this.showAddNewInstrument());
     this.controlsEl.appendChild(btnAddChannel);
   }
@@ -809,34 +848,51 @@ class StepSequencer {
   }
 
   showAddNewInstrument() {
-    let modalEl = document.createElement('div');
-    modalEl.classList.add('modal-window');
-    modalEl.classList.add('modal-window_add-instrument');
+    const modalContentEl = document.createElement('div');
+    modalContentEl.classList.add('modal-content');
+    modalContentEl.classList.add('modal-content_add-instrument');
 
-    let name = document.createElement('input');
-    name.placeholder = 'Unique channel name';
-    let srcLink = document.createElement('input');
-    srcLink.placeholder = 'http or htts full link for mp3 or';
-    let buttonAdd = document.createElement('button');
+    const nameInputGroup = document.createElement('div');
+    nameInputGroup.classList.add('modal-content__input-group');
+
+    const nameInputLabel = document.createElement('label');
+    nameInputLabel.innerText = 'Input unique channel name';
+    nameInputLabel.classList.add('modal-content__input-label');
+
+    const nameInput = document.createElement('input');
+    nameInput.classList.add('modal-content__input');
+    nameInput.placeholder = 'Unique channel name';
+
+    nameInputGroup.append(nameInputLabel);
+    nameInputGroup.append(nameInput);
+
+    const srcLinkInputGroup = document.createElement('div');
+    srcLinkInputGroup.classList.add('modal-content__input-group');
+
+    const srcLinkInputLabel = document.createElement('label');
+    srcLinkInputLabel.innerText = 'Input http or https full link for mp3';
+    srcLinkInputLabel.classList.add('modal-content__input-label');
+
+    const srcLinkInput = document.createElement('input');
+    srcLinkInput.classList.add('modal-content__input');
+    srcLinkInput.placeholder = 'http or https full link for mp3';
+
+    const buttonAdd = document.createElement('button');
+    buttonAdd.classList.add('modal-window__button');
+    buttonAdd.classList.add('modal-window__button_add');
     buttonAdd.innerText = 'Add channel';
-    let buttonCancel = document.createElement('button');
-    buttonCancel.innerText = 'Cancel';
-
-    buttonCancel.onclick = () => {
-      modalEl.remove();
-    };
 
     buttonAdd.onclick = () => {
-      this.addChannel(name.value, srcLink.value, 1);
-      modalEl.remove();
+      this.addChannel(nameInput.value, srcLinkInput.value, 1);
     };
 
-    modalEl.appendChild(name);
-    modalEl.appendChild(srcLink);
-    modalEl.appendChild(buttonAdd);
-    modalEl.appendChild(buttonCancel);
+    srcLinkInputGroup.append(srcLinkInputLabel);
+    srcLinkInputGroup.append(srcLinkInput);
 
-    document.body.appendChild(modalEl);
+    modalContentEl.appendChild(nameInputGroup);
+    modalContentEl.appendChild(srcLinkInputGroup);
+
+    new ModalWindow('modal-window_add-instrument', 'Add new instrument', modalContentEl, buttonAdd);
   }
 
   play() {
@@ -955,39 +1011,21 @@ class DigitalAudioWorkstation {
   }
 
   createControls() {
-    let saveFileNameInput = document.createElement('input');
-    saveFileNameInput.value = 'savedProject.json';
-    saveFileNameInput.classList.add('daw-controls__savename-input');
-    this.controlsEl.appendChild(saveFileNameInput);
-
     const btnSaveFile = document.createElement('button');
-    btnSaveFile.classList.add('daw-controls__button-save');
+    btnSaveFile.classList.add('daw-controls__button');
     btnSaveFile.textContent = 'Save File';
     btnSaveFile.addEventListener('click', () => {
-      this.saveFile(saveFileNameInput.value);
+      this.showSaveFile();
     });
     this.controlsEl.appendChild(btnSaveFile);
 
-    const btnImportFile = document.createElement('input');
-    btnImportFile.classList.add('daw-controls__button-import');
-    btnImportFile.type = 'file';
+    const btnImportFile = document.createElement('button');
+    btnImportFile.classList.add('daw-controls__button');
     btnImportFile.textContent = 'Import File';
-    btnImportFile.addEventListener(
-      'change',
-      (e) => {
-        let file = e.target.files[0];
-        if (!file) {
-          return;
-        }
-        let reader = new FileReader();
-        reader.onload = (e) => {
-          let contents = e.target.result;
-          this.importFromJsonString(contents);
-        };
-        reader.readAsText(file);
-      },
-      false
-    );
+    btnImportFile.addEventListener('click', () => {
+      this.showImportFile();
+    });
+
     this.controlsEl.appendChild(btnImportFile);
 
     // const btnAddSteps = document.createElement("button");
@@ -1071,6 +1109,109 @@ class DigitalAudioWorkstation {
     a.click();
 
     URL.revokeObjectURL(a.href);
+  }
+
+  showSaveFile() {
+    const modalContentEl = document.createElement('div');
+    modalContentEl.classList.add('modal-content');
+    modalContentEl.classList.add('modal-content_save-file');
+
+    const saveFileGroup = document.createElement('div');
+    saveFileGroup.classList.add('modal-content__input-group');
+
+    const saveFileLabel = document.createElement('label');
+    saveFileLabel.innerText = 'Save project to JSON file';
+    saveFileLabel.classList.add('modal-content__input-label');
+
+    const nameInput = document.createElement('input');
+    nameInput.classList.add('modal-content__input');
+    nameInput.placeholder = 'Unique file name';
+    const date = new Date();
+    const dateString = date.toISOString().split('.')[0];
+    nameInput.value = `${dateString}_save.json`;
+
+    const buttonSave = document.createElement('button');
+    buttonSave.classList.add('modal-window__button');
+    buttonSave.classList.add('modal-window__button_save');
+    buttonSave.innerText = 'Save File';
+
+    buttonSave.onclick = () => {
+      this.saveFile(nameInput.value);
+    };
+
+
+    saveFileGroup.append(saveFileLabel);
+    saveFileGroup.append(nameInput);
+
+    modalContentEl.appendChild(saveFileGroup);
+
+    new ModalWindow('modal-window_save-file', 'Save project', modalContentEl, buttonSave);
+  }
+
+  showImportFile() {
+    const modalContentEl = document.createElement('div');
+    modalContentEl.classList.add('modal-content');
+    modalContentEl.classList.add('modal-content_import-file');
+
+    const importFromFileGroup = document.createElement('div');
+    importFromFileGroup.classList.add('modal-content__input-group');
+
+    const importFromFileLabel = document.createElement('label');
+    importFromFileLabel.innerText = 'Choose JSON project file';
+    importFromFileLabel.classList.add('modal-content__input-label');
+
+    const btnImportFile = document.createElement('input');
+    btnImportFile.classList.add('modal-content__button-import');
+    btnImportFile.type = 'file';
+    btnImportFile.addEventListener(
+      'change',
+      (e) => {
+        let file = e.target.files[0];
+        if (!file) {
+          return;
+        }
+        let reader = new FileReader();
+        reader.onload = (e) => {
+          let contents = e.target.result;
+          this.importFromJsonString(contents);
+        };
+        reader.readAsText(file);
+      },
+      false
+    );
+
+    importFromFileGroup.append(importFromFileLabel);
+    importFromFileGroup.append(btnImportFile);
+
+    const importFromURLGroup = document.createElement('div');
+    importFromURLGroup.classList.add('modal-content__input-group');
+
+    const importFromURLLabel = document.createElement('label');
+    importFromURLLabel.innerText = 'Input link for JSON project file';
+    importFromURLLabel.classList.add('modal-content__input-label');
+
+    const linkInput = document.createElement('input');
+    linkInput.classList.add('modal-content__input');
+    linkInput.placeholder = 'URL to JSON save file';
+    linkInput.value = 'https://api.npoint.io/166802b5a42fe68d24bd';
+
+    const buttonImportFromURL = document.createElement('button');
+    buttonImportFromURL.classList.add('modal-window__button');
+    buttonImportFromURL.classList.add('modal-window__button_import');
+    buttonImportFromURL.innerText = 'Import File';
+
+    buttonImportFromURL.onclick = () => {
+      this.loadFileFromUrl(linkInput.value);
+    };
+
+    importFromURLGroup.append(importFromURLLabel);
+    importFromURLGroup.append(linkInput);
+    importFromURLGroup.append(buttonImportFromURL);
+
+    modalContentEl.append(importFromFileGroup);
+    modalContentEl.append(importFromURLGroup);
+
+    new ModalWindow('modal-window_import-file', 'Import project', modalContentEl, document.createElement('div'));
   }
 }
 
